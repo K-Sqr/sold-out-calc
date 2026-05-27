@@ -1,0 +1,120 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: light;
+  }
+
+  html {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply bg-cream-50 text-ink-800 font-sans;
+    font-feature-settings: "ss01", "cv11";
+    font-optical-sizing: auto;
+  }
+
+  /* Give Fraunces a touch of warmth so headlines don't feel clinical. */
+  .font-serif {
+    font-variation-settings: "SOFT" 40, "WONK" 0;
+  }
+
+  /* Remove number input spinners for a cleaner look */
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
+
+  ::selection {
+    background-color: #0e0d0b;
+    color: #fbf9f5;
+  }
+}
+
+@layer components {
+  .container-tool {
+    @apply mx-auto w-full max-w-3xl px-5 sm:px-8;
+  }
+
+  .section-eyebrow {
+    @apply inline-flex items-center gap-2 text-[11px] uppercase tracking-[0.22em] text-ink-400 font-medium;
+  }
+
+  .field-label {
+    @apply block text-sm font-medium text-ink-800 mb-1.5;
+  }
+
+  .field-helper {
+    @apply text-[13px] text-ink-400 mt-1.5 leading-relaxed;
+  }
+
+  .input-base {
+    @apply w-full bg-white border border-ink-100 rounded-xl px-4 py-3.5 text-[15px] text-ink-900 placeholder:text-ink-200 outline-none transition-all duration-200;
+    @apply focus:border-ink-800 focus:ring-4 focus:ring-ink-900/[0.06];
+  }
+
+  .input-currency {
+    @apply pl-9;
+  }
+
+  .card {
+    @apply bg-white border border-ink-100 rounded-3xl shadow-card;
+  }
+
+  .section-card {
+    @apply bg-white border border-ink-100 rounded-3xl p-6 sm:p-8 shadow-soft;
+  }
+
+  .divider-thin {
+    @apply h-px w-full bg-gradient-to-r from-transparent via-ink-100 to-transparent;
+  }
+
+  .btn-primary {
+    @apply inline-flex items-center justify-center gap-2 bg-ink-900 text-cream-50 px-6 py-3.5 rounded-full font-medium text-[15px] tracking-tightish transition-all duration-200 hover:bg-ink-800 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-secondary {
+    @apply inline-flex items-center justify-center gap-2 bg-white text-ink-800 border border-ink-100 px-5 py-3 rounded-full font-medium text-sm tracking-tightish transition-all duration-200 hover:border-ink-800 hover:bg-cream-50 active:scale-[0.98];
+  }
+
+  .btn-ghost {
+    @apply inline-flex items-center justify-center gap-1.5 text-ink-400 hover:text-ink-800 text-sm font-medium transition-colors duration-200;
+  }
+
+  .conv-card {
+    @apply relative bg-white border border-ink-100 rounded-2xl px-4 py-4 sm:py-5 cursor-pointer transition-all duration-200 hover:border-ink-200;
+  }
+
+  .conv-card-active {
+    @apply border-ink-900 shadow-card;
+  }
+
+  .result-number {
+    font-family: "Fraunces", Georgia, serif;
+    font-feature-settings: "lnum", "tnum";
+    font-variation-settings: "SOFT" 30, "opsz" 144;
+    line-height: 1;
+  }
+
+  /* Editorial italic accent — used for the emphasized phrase in the headline.
+     Replaces the old gradient shimmer (which was clipping descenders and
+     reading too "AI demo"). */
+  .editorial-em {
+    @apply italic text-accent-ink;
+    font-variation-settings: "SOFT" 60, "opsz" 144;
+  }
+}
+
+/* Smooth scroll for in-page nav */
+html {
+  scroll-behavior: smooth;
+}

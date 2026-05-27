@@ -1,0 +1,17 @@
+node_modules
+dist
+dist-ssr
+.env
+.env.*
+!.env.example
+.DS_Store
+*.local
+.vscode/*
+!.vscode/extensions.json
+.idea
+*.log
+*.tsbuildinfo
+
+# tsc -b composite build emits .js/.d.ts next to vite.config.ts
+vite.config.js
+vite.config.d.ts
