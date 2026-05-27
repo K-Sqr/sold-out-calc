@@ -17,7 +17,6 @@ import type { CalculatorInputs } from "./types";
 export default function App() {
   const [inputs, setInputs] = useState<CalculatorInputs>(DEFAULT_INPUTS);
   const calcRef = useRef<HTMLDivElement | null>(null);
-  const resultsRef = useRef<HTMLDivElement | null>(null);
 
   const update = (patch: Partial<CalculatorInputs>) =>
     setInputs((prev) => ({ ...prev, ...patch }));
@@ -28,8 +27,17 @@ export default function App() {
     calcRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
-  const handleSeeResults = () => {
-    resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+  const handleJumpToGoal = () => {
+    const goal = document.getElementById("goal");
+    if (!goal) return;
+    goal.scrollIntoView({ behavior: "smooth", block: "start" });
+    // After the scroll settles, focus the first input so they can start typing.
+    window.setTimeout(() => {
+      const firstInput = goal.querySelector<HTMLInputElement>(
+        'input[type="number"]'
+      );
+      firstInput?.focus({ preventScroll: true });
+    }, 500);
   };
 
   const canShowResults = results.isValid;
@@ -52,7 +60,6 @@ export default function App() {
           {canShowResults ? (
             <motion.div
               key="results"
-              ref={resultsRef}
               initial={{ opacity: 0, y: 16 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 12 }}
@@ -85,7 +92,7 @@ export default function App() {
                 forecast. Everything else fine-tunes the numbers.
               </p>
               <button
-                onClick={handleSeeResults}
+                onClick={handleJumpToGoal}
                 className="mt-5 btn-secondary"
                 type="button"
               >
