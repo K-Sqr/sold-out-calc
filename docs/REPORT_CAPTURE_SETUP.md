@@ -161,6 +161,61 @@ Yes — keep the Google Sheet open in a tab. Rows append live as people submit.
 
 ---
 
+## (Optional) SMS report links via Twilio
+
+When a user enters their phone number, the app now sends them an SMS with a personalized link to their forecast results. The link encodes their inputs as URL params — no database needed.
+
+### What you need
+
+- A **Twilio account** (free trial works for testing) — [twilio.com/try-twilio](https://www.twilio.com/try-twilio)
+- A **Twilio phone number** that can send SMS (your CEO's number `+15147007315` if it's registered in Twilio, or buy one for ~$1/month)
+- Three credentials from the [Twilio Console](https://console.twilio.com):
+  - **Account SID** — starts with `AC...`
+  - **Auth Token** — visible on the dashboard
+  - **From Number** — the Twilio phone number in E.164 format (e.g. `+15147007315`)
+
+### Setup (one-time, ~2 minutes)
+
+1. In the **Apps Script editor** for your Google Sheet, go to **Project Settings** (the gear icon in the left sidebar).
+2. Scroll to **Script Properties** and add three entries:
+
+   | Property | Value |
+   | --- | --- |
+   | `TWILIO_ACCOUNT_SID` | `ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx` |
+   | `TWILIO_AUTH_TOKEN` | your auth token |
+   | `TWILIO_FROM_NUMBER` | `+15147007315` (or your Twilio number) |
+
+3. **Redeploy** the Web App so the updated `Code.gs` is live: **Deploy → Manage deployments → edit → Version: New version → Deploy**.
+
+That's it. The next time someone submits the form with a phone number, they'll receive an SMS like:
+
+> Here's your Sold-Out Gap report — tap to pick up where you left off:
+> https://yourtool.com?goal=5000&aov=85&email=320&conv=realistic
+
+Tapping the link opens the calculator with their exact numbers pre-filled and results showing immediately.
+
+### How it works
+
+1. The React app encodes the user's calculator inputs into URL query params via `buildReportUrl()`.
+2. That URL is included in the POST payload to Apps Script as `reportUrl`.
+3. Apps Script calls Twilio's REST API to send a single transactional SMS with the link.
+4. When the user opens the link, `readInputsFromUrl()` parses the params and pre-fills the calculator.
+
+### Costs
+
+- Twilio SMS: ~$0.0079/message in the US, ~$0.05/message internationally
+- No other infrastructure costs — everything runs in Google Apps Script
+
+### If Twilio isn't configured
+
+SMS is silently skipped. The email report still sends normally. You'll see `SMS skipped — Twilio credentials not configured` in the Apps Script execution log.
+
+### Twilio trial account limitations
+
+On a free trial, you can only send SMS to **verified** phone numbers (numbers you've confirmed in the Twilio console). To send to any number, upgrade your Twilio account (~$20 minimum top-up).
+
+---
+
 ## When to graduate from Apps Script
 
 Apps Script is great for V1. You'll likely want to move when:
@@ -168,6 +223,6 @@ Apps Script is great for V1. You'll likely want to move when:
 - You hit the 100/day (free) or 1,500/day (Workspace) MailApp quota
 - You want richer email branding, open/click tracking, or A/B testing
 - You want to add to a CRM (HubSpot, Notion, Airtable, etc.)
-- You want SMS to be more than just data capture
+- You want more sophisticated SMS flows (reminders, sequences, etc.)
 
 When that day comes: swap `submitReport` in `src/lib/reportSubmit.ts` to call **your** endpoint (Resend, Loops, ConvertKit, your own API). The frontend doesn't care where the data goes — it just POSTs JSON to whatever URL you give it.

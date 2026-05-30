@@ -1,11 +1,13 @@
 import type { CalculatorInputs, CalculatorResults } from "../types";
 import { getConfidence } from "./calculations";
+import { buildReportUrl } from "./urlParams";
 
 export interface ReportPayload {
   email: string;
   phone: string;
   submittedAt: string;
   sourceUrl: string;
+  reportUrl: string;
   inputs: {
     revenueGoal: number;
     averageOrderValue: number;
@@ -49,6 +51,7 @@ export function buildPayload(
     phone: phone.trim(),
     submittedAt: new Date().toISOString(),
     sourceUrl: typeof window !== "undefined" ? window.location.href : "",
+    reportUrl: buildReportUrl(inputs),
     inputs: {
       revenueGoal: inputs.revenueGoal,
       averageOrderValue: inputs.averageOrderValue,

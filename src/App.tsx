@@ -12,10 +12,15 @@ import { SoftCTA } from "./components/SoftCTA";
 import { TimelineSection } from "./components/TimelineSection";
 import { WarmDemandSection } from "./components/WarmDemandSection";
 import { DEFAULT_INPUTS, calculate } from "./lib/calculations";
+import { readInputsFromUrl } from "./lib/urlParams";
 import type { CalculatorInputs } from "./types";
 
+function getInitialInputs(): CalculatorInputs {
+  return { ...DEFAULT_INPUTS, ...readInputsFromUrl() };
+}
+
 export default function App() {
-  const [inputs, setInputs] = useState<CalculatorInputs>(DEFAULT_INPUTS);
+  const [inputs, setInputs] = useState<CalculatorInputs>(getInitialInputs);
   const calcRef = useRef<HTMLDivElement | null>(null);
 
   const update = (patch: Partial<CalculatorInputs>) =>

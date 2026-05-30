@@ -102,7 +102,7 @@ export function SendReport({ inputs, results }: Props) {
             <input
               id="report-phone"
               type="tel"
-              placeholder="Phone (optional)"
+              placeholder="Phone — we'll text you the link (optional)"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               className="input-base"
@@ -165,7 +165,9 @@ export function SendReport({ inputs, results }: Props) {
                 <Check />
                 {demo
                   ? "Demo: form submitted (no email sent — endpoint not configured)."
-                  : "Sent — check your inbox in a minute."}
+                  : phone.trim()
+                    ? "Sent — check your inbox and phone in a minute."
+                    : "Sent — check your inbox in a minute."}
               </motion.p>
             )}
           </AnimatePresence>

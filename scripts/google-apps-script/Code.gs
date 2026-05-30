@@ -18,7 +18,7 @@ const EMAIL_SUBJECT = 'Your Sold-Out Gap Forecast';
 
 // Optional: where the "Recalculate" button in the email should link to.
 // If empty, the script falls back to the page the user submitted from.
-const TOOL_URL = '';
+const TOOL_URL = 'https://sold-out-calc.vercel.app/';
 
 // Optional: where the "Get a Free Drop Leak Check" button should link.
 const DROP_LEAK_CHECK_URL = '';
@@ -49,12 +49,20 @@ function doPost(e) {
       sendReportEmail_(data);
       emailed = true;
     } catch (mailErr) {
-      // Don't fail the whole request if the mailer trips.
-      // The lead is already saved to the sheet.
       Logger.log('Mail send failed: ' + mailErr);
     }
 
-    return jsonOut_({ ok: true, emailed: emailed });
+    let smsSent = false;
+    if (data.phone && String(data.phone).trim().length >= 10 && data.reportUrl) {
+      try {
+        sendReportSms_(data.phone, data.reportUrl);
+        smsSent = true;
+      } catch (smsErr) {
+        Logger.log('SMS send failed: ' + smsErr);
+      }
+    }
+
+    return jsonOut_({ ok: true, emailed: emailed, smsSent: smsSent });
   } catch (err) {
     Logger.log(err);
     return jsonOut_({ ok: false, error: String(err) });
@@ -299,6 +307,54 @@ function renderEmailText_(d) {
     'Insight: Followers don\'t forecast demand. Warm buyers do.',
   ];
   return lines.join('\n');
+}
+
+// ---------- SMS via Twilio ------------------------------------------------
+
+/**
+ * Send a one-time SMS with the user's report link via Twilio.
+ *
+ * Requires three Script Properties (set once via Apps Script editor →
+ * Project Settings → Script Properties):
+ *   TWILIO_ACCOUNT_SID  — your Twilio Account SID
+ *   TWILIO_AUTH_TOKEN   — your Twilio Auth Token
+ *   TWILIO_FROM_NUMBER  — your Twilio phone number (E.164, e.g. +15147007315)
+ */
+function sendReportSms_(toPhone, reportUrl) {
+  var props = PropertiesService.getScriptProperties();
+  var sid   = props.getProperty('TWILIO_ACCOUNT_SID');
+  var token = props.getProperty('TWILIO_AUTH_TOKEN');
+  var from  = props.getProperty('TWILIO_FROM_NUMBER');
+
+  if (!sid || !token || !from) {
+    Logger.log('SMS skipped — Twilio credentials not configured in Script Properties.');
+    return;
+  }
+
+  var to = String(toPhone).trim();
+  if (to.charAt(0) !== '+') {
+    to = '+1' + to.replace(/\D/g, '');
+  }
+
+  var url = 'https://api.twilio.com/2010-04-01/Accounts/' + sid + '/Messages.json';
+
+  var response = UrlFetchApp.fetch(url, {
+    method: 'post',
+    headers: {
+      Authorization: 'Basic ' + Utilities.base64Encode(sid + ':' + token),
+    },
+    payload: {
+      To: to,
+      From: from,
+      Body: "Here\u2019s your Sold-Out Gap report \u2014 tap to pick up where you left off:\n" + reportUrl,
+    },
+    muteHttpExceptions: true,
+  });
+
+  var code = response.getResponseCode();
+  if (code < 200 || code >= 300) {
+    throw new Error('Twilio returned ' + code + ': ' + response.getContentText());
+  }
 }
 
 // ---------- Helpers --------------------------------------------------------
