@@ -192,7 +192,9 @@ function renderEmailHtml_(d) {
   const convPct = safeNum_(i.conversionRate);
   const coveragePct = Math.max(0, Math.min(100, Math.round(safeNum_(r.coverageRatio) * 100)));
 
-  const toolUrl = TOOL_URL || d.sourceUrl || '';
+  // Build a pre-filled URL from the inputs so "Recalculate" opens the
+  // calculator with the user's numbers already entered.
+  const toolUrl = buildReportUrl_(d);
 
   const gapZero = gap <= 0;
 
@@ -309,6 +311,60 @@ function renderEmailText_(d) {
   return lines.join('\n');
 }
 
+// ---------- Report URL ------------------------------------------------------
+
+/**
+ * Build a link to the calculator with the user's figures encoded as query
+ * params, so the page opens pre-filled instead of blank.
+ *
+ * The short param keys mirror the frontend's reader (src/lib/urlParams.ts):
+ *   goal, aov, email, sms, ig, vip, other, followers, days, conv, custom
+ *
+ * Falls back to whatever the frontend sent (d.reportUrl), then the bare
+ * TOOL_URL / source URL if there are no inputs to encode.
+ */
+function buildReportUrl_(d) {
+  const i = d.inputs || {};
+
+  let base = TOOL_URL || d.sourceUrl || d.reportUrl || '';
+  if (!base) return '';
+  // Drop any existing query/hash so we start from a clean base.
+  base = base.split('#')[0].split('?')[0];
+
+  const parts = [];
+  const addNum = function (key, value) {
+    const n = Number(value);
+    if (isFinite(n) && n > 0) {
+      parts.push(encodeURIComponent(key) + '=' + encodeURIComponent(n));
+    }
+  };
+
+  addNum('goal', i.revenueGoal);
+  addNum('aov', i.averageOrderValue);
+  addNum('email', i.emailList);
+  addNum('sms', i.smsList);
+  addNum('ig', i.igBroadcast);
+  addNum('vip', i.waitlistVip);
+  addNum('other', i.otherDirect);
+  addNum('followers', i.followerCount);
+  addNum('days', i.daysUntilLaunch);
+
+  if (i.conversionOption) {
+    parts.push('conv=' + encodeURIComponent(i.conversionOption));
+    // For a custom rate, the resolved percentage is the custom value.
+    if (i.conversionOption === 'custom') {
+      addNum('custom', i.conversionRate);
+    }
+  }
+
+  const qs = parts.join('&');
+  if (!qs) {
+    // No inputs to encode — use whatever the frontend gave us, else the base.
+    return d.reportUrl || base;
+  }
+  return base + '?' + qs;
+}
+
 // ---------- SMS via Twilio ------------------------------------------------
 
 /**
@@ -318,7 +374,7 @@ function renderEmailText_(d) {
  * Project Settings → Script Properties):
  *   TWILIO_ACCOUNT_SID  — your Twilio Account SID
  *   TWILIO_AUTH_TOKEN   — your Twilio Auth Token
- *   TWILIO_FROM_NUMBER  — your Twilio phone number (E.164, e.g. +15147007315)
+ *   TWILIO_FROM_NUMBER  — your toll-free number (E.164, e.g. +18667744589)
  */
 function sendReportSms_(toPhone, reportUrl) {
   var props = PropertiesService.getScriptProperties();
@@ -412,6 +468,7 @@ function runSelfTest() {
         phone: '',
         submittedAt: new Date().toISOString(),
         sourceUrl: 'https://example.com/test',
+        reportUrl: 'https://sold-out-calc.vercel.app/?goal=10000&aov=120&email=500&sms=150&ig=300&vip=100&followers=50000&days=14',
         inputs: {
           revenueGoal: 10000,
           averageOrderValue: 120,

@@ -102,7 +102,7 @@ export function SendReport({ inputs, results }: Props) {
             <input
               id="report-phone"
               type="tel"
-              placeholder="Phone — we'll text you the link (optional)"
+              placeholder="Phone (optional)"
               value={phone}
               onChange={(e) => setPhone(e.target.value)}
               className="input-base"
@@ -147,13 +147,6 @@ export function SendReport({ inputs, results }: Props) {
             )}
           </button>
 
-          {phone.trim() && (
-            <p className="text-[11.5px] text-ink-400 leading-snug">
-              By entering your phone number, you agree to receive this report
-              and occasional launch-planning reminders. You can opt out anytime.
-            </p>
-          )}
-
           <AnimatePresence>
             {success && (
               <motion.p
@@ -165,9 +158,7 @@ export function SendReport({ inputs, results }: Props) {
                 <Check />
                 {demo
                   ? "Demo: form submitted (no email sent — endpoint not configured)."
-                  : phone.trim()
-                    ? "Sent — check your inbox and phone in a minute."
-                    : "Sent — check your inbox in a minute."}
+                  : "Sent — check your inbox in a minute."}
               </motion.p>
             )}
           </AnimatePresence>

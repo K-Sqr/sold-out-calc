@@ -168,11 +168,11 @@ When a user enters their phone number, the app now sends them an SMS with a pers
 ### What you need
 
 - A **Twilio account** (free trial works for testing) — [twilio.com/try-twilio](https://www.twilio.com/try-twilio)
-- A **Twilio phone number** that can send SMS (your CEO's number `+15147007315` if it's registered in Twilio, or buy one for ~$1/month)
+- A **Twilio toll-free number** that can send SMS (e.g. `+18667744589`) — must complete [Toll-Free Verification](https://console.twilio.com) before messages deliver to US numbers
 - Three credentials from the [Twilio Console](https://console.twilio.com):
   - **Account SID** — starts with `AC...`
   - **Auth Token** — visible on the dashboard
-  - **From Number** — the Twilio phone number in E.164 format (e.g. `+15147007315`)
+  - **From Number** — your verified toll-free number in E.164 format (e.g. `+18667744589`)
 
 ### Setup (one-time, ~2 minutes)
 
@@ -183,7 +183,7 @@ When a user enters their phone number, the app now sends them an SMS with a pers
    | --- | --- |
    | `TWILIO_ACCOUNT_SID` | `ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx` |
    | `TWILIO_AUTH_TOKEN` | your auth token |
-   | `TWILIO_FROM_NUMBER` | `+15147007315` (or your Twilio number) |
+   | `TWILIO_FROM_NUMBER` | `+18667744589` |
 
 3. **Redeploy** the Web App so the updated `Code.gs` is live: **Deploy → Manage deployments → edit → Version: New version → Deploy**.
 
