@@ -22,17 +22,17 @@ export function SoftCTA() {
           Next Step
         </p>
         <h3 className="mt-3 font-serif text-[28px] sm:text-[34px] leading-tight tracking-tightish">
-          Want help pressure-testing your next drop?
+          Want to know what's actually capping your drops?
         </h3>
         <p className="mt-3 text-[15px] text-cream-100/75 leading-relaxed">
-          We can review your current launch plan and show where warm demand may
-          be leaking before launch day.
+          Take the Sold-Out Stage Diagnostic — a few questions about your drop
+          economics, and we'll map your stage and likely growth bottleneck.
         </p>
         <a
-          href="#"
+          href="/diagnostic"
           className="mt-6 inline-flex items-center gap-2 bg-cream-50 text-ink-900 px-6 py-3.5 rounded-full font-medium text-[15px] hover:bg-white transition-colors duration-200 group"
         >
-          Get a Free Drop Leak Check
+          Take the Stage Diagnostic
           <svg
             className="transition-transform duration-300 group-hover:translate-x-0.5"
             width="16"

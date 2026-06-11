@@ -145,3 +145,50 @@ The goal is one realization:
 > "I don't just need more hype. I need enough warm demand before launch."
 
 That's the whole product.
+
+---
+
+## Sold-Out Stage Diagnostic V0 (`/diagnostic`)
+
+A second tool lives in the same codebase and design world: a branded,
+multi-step **diagnostic + data-capture** form for fashion drop operators.
+It is *not* another free calculator — it's the data foundation for the paid
+product.
+
+- **Local:** `npm run dev`, then open http://localhost:5173/diagnostic
+- **Production:** `/diagnostic` (a `vercel.json` rewrite maps it to
+  `diagnostic.html`; a small Vite plugin mirrors this in dev/preview).
+- The calculator's end-of-results CTA ("Take the Stage Diagnostic") links to
+  it, and the diagnostic header links back to the free calculator.
+
+The calculator is untouched — both tools build together as separate Vite
+entries.
+
+### Where things live
+
+```
+diagnostic.html                       # second Vite entry
+src/diagnostic/
+├── main.tsx                          # React entry
+├── DiagnosticApp.tsx                 # multi-step stepper + confirmation
+├── schema.ts                         # ⭐ ALL questions live here (edit this)
+├── types.ts                          # form model
+├── logic.ts                          # conditional visibility + validation
+├── submit.ts                         # builds payload + posts to Apps Script
+└── components/                       # Field, ProgressBar, Confirmation
+scripts/google-apps-script/
+└── DiagnosticCode.gs                 # Sheets capture + editable scoring
+docs/DIAGNOSTIC_SETUP.md              # ~5-min Google Sheets wiring
+```
+
+### Adding / editing questions
+
+Edit `src/diagnostic/schema.ts`. Each question's `id` becomes a Google Sheet
+column, and new columns are created automatically by the Apps Script — no
+backend change needed. Scoring logic (stage / fit / bottleneck / module) is in
+one editable place: `scoreSubmission_` in `DiagnosticCode.gs`.
+
+### Submissions
+
+Set `VITE_DIAGNOSTIC_ENDPOINT_URL` (see `docs/DIAGNOSTIC_SETUP.md`). Without it,
+the form runs in demo mode: fully usable, but nothing is saved.
