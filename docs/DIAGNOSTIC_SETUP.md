@@ -41,7 +41,8 @@ In the Apps Script editor:
 2. Approve the permission prompt the first time (it needs access to the sheet).
 3. Switch to the Google Sheet — you should see a `Diagnostics` tab with one test
    row, including the auto-filled **Estimated Stage**, **Paid Fit Score**,
-   **Primary Bottleneck**, and **Recommended Sold-Out Module**.
+   **Revenue Gap**, **Primary Growth Lever**, **Primary Bottleneck**,
+   **Recommended Sold-Out Engine**, and **Fit Status**.
 
 You can delete the test row afterward.
 
@@ -94,11 +95,15 @@ Open `scripts/google-apps-script/DiagnosticCode.gs` and edit:
 
 - `estimateStage_` — Beta / Growth / Adaptation thresholds
 - `paidFitScore_` — the 0–100 fit weighting
-- `primaryBottleneck_` — label for the self-assessed constraint
-- `recommendedModule_` — which Sold-Out module each bottleneck routes to
+- `revenueGap_` — how the target revenue jump is computed
+- `routeBottleneck_` — the single map from self-assessed constraint →
+  Primary Growth Lever + Recommended **Sold-Out Engine** (Offer, Attention,
+  Demand, Launch, Aftermath, Operating Rhythm). The engines aren't built yet —
+  this is just the routing label.
+- `fitStatus_` — the coarse triage bucket
 
 Save, then **Deploy → Manage deployments → Edit → New version** to publish the
 change. No frontend redeploy needed.
 
-`Notes` and `Follow-up Status` are intentionally left blank for your team to
+`Notes` and `Follow-Up Status` are intentionally left blank for your team to
 fill in during review.

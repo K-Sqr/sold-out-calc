@@ -185,7 +185,8 @@ docs/DIAGNOSTIC_SETUP.md              # ~5-min Google Sheets wiring
 
 Edit `src/diagnostic/schema.ts`. Each question's `id` becomes a Google Sheet
 column, and new columns are created automatically by the Apps Script — no
-backend change needed. Scoring logic (stage / fit / bottleneck / module) is in
+backend change needed. Scoring logic (stage / fit / revenue gap / growth lever /
+bottleneck / Sold-Out Engine routing) is in
 one editable place: `scoreSubmission_` in `DiagnosticCode.gs`.
 
 ### Submissions

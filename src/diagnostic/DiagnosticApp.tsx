@@ -265,9 +265,9 @@ function Intro({ onStart }: { onStart: () => void }) {
       </h1>
 
       <p className="mt-5 mx-auto max-w-xl text-[16px] sm:text-[17px] text-ink-400 leading-relaxed">
-        A few quick questions about your drops, your numbers, and what's holding
-        the next level back. We'll map your stage and likely growth bottleneck —
-        then point you to the right next move.
+        A short diagnostic across your drop economics, offer, attention, demand,
+        launch, and retention. We'll map your revenue stage and likely growth
+        bottleneck — then point you to the right next move.
       </p>
 
       <div className="mt-9 flex items-center justify-center gap-4 flex-wrap">
@@ -295,7 +295,7 @@ function Intro({ onStart }: { onStart: () => void }) {
             <circle cx="7" cy="7" r="6" stroke="currentColor" strokeWidth="1.2" />
             <path d="M7 4v3.2L9 8.4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
           </svg>
-          ~3 minutes · no signup
+          ~5 minutes · no signup
         </div>
       </div>
     </motion.section>

@@ -25,10 +25,13 @@ const SHEET_NAME = 'Diagnostics';
 const INTERNAL_COLUMNS = [
   'Estimated Stage',
   'Paid Fit Score',
+  'Revenue Gap',
+  'Primary Growth Lever',
   'Primary Bottleneck',
-  'Recommended Sold-Out Module',
+  'Recommended Sold-Out Engine',
+  'Fit Status',
   'Notes',
-  'Follow-up Status',
+  'Follow-Up Status',
 ];
 
 // ---------- Entry points ---------------------------------------------------
@@ -142,11 +145,14 @@ function appendSubmission_(sheet, data, fields, scores) {
     rowMap[label] = (f.display !== undefined && f.display !== '') ? f.display : f.value;
   });
 
-  // Auto-filled internal columns (Notes / Follow-up Status left blank for us).
+  // Auto-filled internal columns (Notes / Follow-Up Status left blank for us).
   rowMap['Estimated Stage'] = scores.stage;
   rowMap['Paid Fit Score'] = scores.fitScore;
+  rowMap['Revenue Gap'] = scores.revenueGap;
+  rowMap['Primary Growth Lever'] = scores.growthLever;
   rowMap['Primary Bottleneck'] = scores.bottleneck;
-  rowMap['Recommended Sold-Out Module'] = scores.module;
+  rowMap['Recommended Sold-Out Engine'] = scores.engine;
+  rowMap['Fit Status'] = scores.fitStatus;
 
   const row = headers.map(function (h) {
     return rowMap[h] !== undefined ? rowMap[h] : '';
@@ -159,28 +165,35 @@ function appendSubmission_(sheet, data, fields, scores) {
 
 /**
  * Simple, EDITABLE first-pass scoring. The directive is explicit that this
- * does not need to be perfect yet — the point is a flexible data model.
+ * does not need to be perfect yet — the point is a flexible data model that
+ * inspects multiple possible bottlenecks (offer, attention, demand, launch,
+ * aftermath, operations) rather than assuming pre-launch demand.
  *
  * `byId` keys are the question ids from src/diagnostic/schema.ts, e.g.
- * monthly_revenue, has_launched, bottleneck, email_list_size, runs_paid_ads...
+ * monthly_revenue, bottleneck, email_list_size, runs_paid_ads, next_drop_goal...
  */
 function scoreSubmission_(byId) {
+  const route = routeBottleneck_(byId);
+  const fitScore = paidFitScore_(byId);
   return {
     stage: estimateStage_(byId),
-    fitScore: paidFitScore_(byId),
-    bottleneck: primaryBottleneck_(byId),
-    module: recommendedModule_(byId),
+    fitScore: fitScore,
+    revenueGap: revenueGap_(byId),
+    growthLever: route.lever,
+    bottleneck: route.bottleneck,
+    engine: route.engine,
+    fitStatus: fitStatus_(byId, fitScore),
   };
 }
 
 function estimateStage_(b) {
   const monthly = b.monthly_revenue || '';
-  const launched = (b.has_launched || '').toLowerCase() === 'yes';
+  const launched = num_(b.num_drops) > 0;
 
   // Adaptation / Diversify: $100K+/month.
   if (monthly === '100k_plus_mo') return 'Adaptation / Diversify';
 
-  // Growth / Scale + Stabilize: $30K–$100K/month with proven launches.
+  // Growth / Scale + Stabilize: $30K–$100K/month.
   if (monthly === '30k_100k_mo') return 'Growth / Scale + Stabilize';
 
   // Everything else (under $30K/month, or no proven launches): Beta / Prove It.
@@ -189,74 +202,138 @@ function estimateStage_(b) {
 }
 
 /**
- * 0–100 rough "is this a fit for the first paid install offer?" signal.
+ * 0–100 rough "is this a fit for a first paid install?" signal.
  * Higher = more proven economics to work with. Tune the weights as we learn.
  */
 function paidFitScore_(b) {
   let score = 0;
 
-  if ((b.has_launched || '').toLowerCase() === 'yes') score += 20;
+  if (num_(b.num_drops) > 0) score += 15;
 
   const monthly = b.monthly_revenue || '';
   if (monthly === '10k_30k_mo') score += 20;
   else if (monthly === '30k_100k_mo') score += 35;
-  else if (monthly === '100k_plus_mo') score += 30; // very large may route to a future module
+  else if (monthly === '100k_plus_mo') score += 30; // very large may route to a future engine
   else if (monthly === 'under_10k_mo') score += 5;
 
   // Owned audience to activate.
   const list = num_(b.email_list_size) + num_(b.sms_list_size) + num_(b.community_size);
-  if (list >= 10000) score += 20;
-  else if (list >= 2500) score += 14;
-  else if (list >= 500) score += 8;
+  if (list >= 10000) score += 15;
+  else if (list >= 2500) score += 10;
+  else if (list >= 500) score += 6;
 
-  // Some commercial infrastructure already in place.
-  if ((b.uses_shopify || '').toLowerCase() === 'yes') score += 5;
+  // Healthy unit economics make a paid install more likely to pay back.
+  const margin = b.gross_margin || '';
+  if (margin === '60_75' || margin === '75_plus') score += 10;
+  else if (margin === '40_60') score += 5;
+  if ((b.drops_profitable || '').toLowerCase() === 'yes') score += 5;
+
+  // Some commercial infrastructure / intent already in place.
   if ((b.runs_paid_ads || '').toLowerCase() === 'yes') score += 5;
-
-  // A concrete near-term goal.
   if (num_(b.next_drop_goal) > 0) score += 5;
 
   return Math.max(0, Math.min(100, Math.round(score)));
 }
 
-/** Echo the operator's self-assessed constraint as a clean label. */
-function primaryBottleneck_(b) {
-  const map = {
-    not_enough_buyers: 'Not enough pre-launch buyers',
-    too_dependent_social: 'Over-dependent on IG/TikTok reach',
-    list_too_small: 'Email/SMS list too small',
-    like_not_buy: 'Engagement without conversion',
-    aov_too_low: 'AOV too low',
-    inconsistent_drops: 'Inconsistent drops',
-    low_sell_through: 'Low sell-through',
-    ads_not_profitable: 'Paid ads not profitable',
-    low_retention: 'Weak retention / repeat',
-    not_sure: 'Unsure (needs review)',
+/**
+ * The revenue jump the brand is trying to make: next drop goal minus a midpoint
+ * estimate of their last drop. Returns a signed number (blank if not enough
+ * data). Editable — swap in best-drop or monthly logic later if we prefer.
+ */
+function revenueGap_(b) {
+  const goal = num_(b.next_drop_goal);
+  if (goal <= 0) return '';
+  const lastMid = dropRangeMidpoint_(b.last_drop_revenue);
+  if (lastMid === null) return goal; // no baseline — the goal itself is the target
+  return goal - lastMid;
+}
+
+function dropRangeMidpoint_(range) {
+  const mids = {
+    under_10k: 5000,
+    '10k_25k': 17500,
+    '25k_50k': 37500,
+    '50k_100k': 75000,
+    '100k_plus': 125000,
   };
-  const v = b.bottleneck || '';
-  return map[v] || (v ? v : 'Unsure (needs review)');
+  return mids[range] !== undefined ? mids[range] : null;
 }
 
 /**
- * Map the self-assessed bottleneck to a candidate Sold-Out module. These are
- * placeholders — the real module set is decided after more data. Kept here so
- * the routing is visible and editable in one spot.
+ * Map the self-assessed constraint to a primary growth lever + the candidate
+ * Sold-Out Engine we may install first. ENGINES ARE NOT BUILT YET — this is
+ * just the routing label. All of this is intentionally easy to edit.
  */
-function recommendedModule_(b) {
+function routeBottleneck_(b) {
+  // bottleneck value -> { label, lever, engine }
   const map = {
-    not_enough_buyers: 'Pre-Launch Demand Engine',
-    too_dependent_social: 'Owned Audience Builder',
-    list_too_small: 'Owned Audience Builder',
-    like_not_buy: 'Conversion / Offer Tune-up',
-    aov_too_low: 'AOV / Bundle Builder',
-    inconsistent_drops: 'Drop Cadence System',
-    low_sell_through: 'Sell-Through / Inventory Match',
-    ads_not_profitable: 'Paid Acquisition Tune-up',
-    low_retention: 'Retention / Repeat Engine',
-    not_sure: 'Needs manual review',
+    offer_unclear: {
+      label: 'Offer/product not clear enough',
+      lever: 'Offer', engine: 'Sold-Out Offer Engine',
+    },
+    not_special: {
+      label: "Can't communicate why it's special",
+      lever: 'Attention', engine: 'Sold-Out Attention Engine',
+    },
+    not_enough_ready: {
+      label: 'Not enough warm buyers before launch',
+      lever: 'Demand', engine: 'Sold-Out Demand Engine',
+    },
+    too_dependent_social: {
+      label: 'Over-dependent on IG/TikTok reach',
+      lever: 'Demand', engine: 'Sold-Out Demand Engine',
+    },
+    aov_too_low: {
+      label: 'AOV too low',
+      lever: 'Offer', engine: 'Sold-Out Offer Engine',
+    },
+    margins_tight: {
+      label: 'Margins too tight',
+      lever: 'Offer', engine: 'Sold-Out Offer Engine',
+    },
+    launch_chaotic: {
+      label: 'Chaotic launch execution',
+      lever: 'Launch', engine: 'Sold-Out Launch Engine',
+    },
+    inconsistent_drops: {
+      label: 'Inconsistent drops',
+      lever: 'Operating Rhythm', engine: 'Sold-Out Operating Rhythm',
+    },
+    low_repeat: {
+      label: 'Weak repeat / retention',
+      lever: 'Aftermath', engine: 'Sold-Out Aftermath Engine',
+    },
+    ads_not_profitable: {
+      label: 'Paid ads not profitable',
+      lever: 'Offer', engine: 'Sold-Out Offer Engine',
+    },
+    not_sure: {
+      label: 'Unsure (needs review)',
+      lever: 'Needs review', engine: 'Needs manual review',
+    },
   };
+
   const v = b.bottleneck || '';
-  return map[v] || 'Needs manual review';
+  const hit = map[v];
+  if (hit) {
+    return { bottleneck: hit.label, lever: hit.lever, engine: hit.engine };
+  }
+  return {
+    bottleneck: v || 'Unsure (needs review)',
+    lever: 'Needs review',
+    engine: 'Needs manual review',
+  };
+}
+
+/**
+ * Coarse fit bucket for quick triage. Editable. Very large brands are flagged
+ * for review since they may be routed to a future (not-yet-built) engine.
+ */
+function fitStatus_(b, score) {
+  if ((b.monthly_revenue || '') === '100k_plus_mo') return 'Review — possible future engine';
+  if (score >= 60) return 'Likely fit';
+  if (score >= 35) return 'Maybe — needs review';
+  return 'Not yet';
 }
 
 // ---------- Helpers --------------------------------------------------------
@@ -291,12 +368,14 @@ function runDiagnosticSelfTest() {
           { id: 'email_list_size', label: 'Email list size', value: '3000', display: '3000' },
           { id: 'sms_list_size', label: 'SMS list size', value: '800', display: '800' },
           { id: 'community_size', label: 'Waitlist / VIP / community size', value: '400', display: '400' },
-          { id: 'has_launched', label: 'Have you launched before?', value: 'Yes', display: 'Yes' },
           { id: 'monthly_revenue', label: 'Approx. monthly revenue range', value: '30k_100k_mo', display: '$30K – $100K / month' },
-          { id: 'uses_shopify', label: 'Do you currently use Shopify?', value: 'Yes', display: 'Yes' },
-          { id: 'runs_paid_ads', label: 'Do you currently run paid ads?', value: 'Yes', display: 'Yes' },
-          { id: 'next_drop_goal', label: 'Next drop revenue goal', value: '40000', display: '40000' },
-          { id: 'bottleneck', label: 'Biggest constraint right now', value: 'aov_too_low', display: 'AOV is too low' },
+          { id: 'last_drop_revenue', label: 'Last drop revenue range', value: '25k_50k', display: '$25K – $50K' },
+          { id: 'num_drops', label: 'Number of drops launched so far', value: '6', display: '6' },
+          { id: 'gross_margin', label: 'Gross margin range', value: '60_75', display: '60% – 75%' },
+          { id: 'drops_profitable', label: 'Are your drops profitable...', value: 'yes', display: 'Yes' },
+          { id: 'runs_paid_ads', label: 'Do you run paid ads?', value: 'Yes', display: 'Yes' },
+          { id: 'next_drop_goal', label: 'Next drop revenue goal', value: '60000', display: '60000' },
+          { id: 'bottleneck', label: 'What feels like the biggest constraint right now?', value: 'aov_too_low', display: 'AOV is too low' },
         ],
       }),
     },

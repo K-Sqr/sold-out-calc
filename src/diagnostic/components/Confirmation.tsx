@@ -32,10 +32,11 @@ export function Confirmation() {
         <span className="editorial-em">submitted.</span>
       </h2>
 
-      <p className="mt-4 mx-auto max-w-md text-[15px] sm:text-[16px] text-ink-400 leading-relaxed">
-        We'll review your drop economics, current stage, and likely growth
-        bottleneck. If there's a fit, we'll send back your recommended next
-        Sold-Out module.
+      <p className="mt-4 mx-auto max-w-lg text-[15px] sm:text-[16px] text-ink-400 leading-relaxed">
+        We'll review your drop economics, offer, attention, demand, launch, and
+        retention signals to identify your current stage and likely growth
+        bottleneck. If there's a fit, we'll send back the recommended Sold-Out
+        Engine for your next revenue stage.
       </p>
 
       <div className="mt-7 flex items-center justify-center">
