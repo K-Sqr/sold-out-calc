@@ -2,18 +2,23 @@ import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 
 /**
- * Serve /diagnostic as /diagnostic.html in dev + preview, mirroring the
- * production rewrite in vercel.json so the link works the same everywhere.
+ * Serve clean routes (e.g. /diagnostic, /snapshot) as their .html entry in
+ * dev + preview, mirroring the production rewrites in vercel.json so links
+ * work the same everywhere.
  */
-function diagnosticRewrite(): Plugin {
+function cleanRouteRewrite(): Plugin {
+  const routes = ["diagnostic", "snapshot"];
   const rewrite = (req: { url?: string | undefined }) => {
     const url = req.url ?? "";
-    if (url === "/diagnostic" || url.startsWith("/diagnostic?")) {
-      req.url = "/diagnostic.html";
+    for (const route of routes) {
+      if (url === `/${route}` || url.startsWith(`/${route}?`)) {
+        req.url = `/${route}.html`;
+        return;
+      }
     }
   };
   return {
-    name: "diagnostic-rewrite",
+    name: "clean-route-rewrite",
     configureServer(server) {
       server.middlewares.use((req, _res, next) => {
         // @types/node isn't installed, so IncomingMessage is an empty stub.
@@ -31,7 +36,7 @@ function diagnosticRewrite(): Plugin {
 }
 
 export default defineConfig({
-  plugins: [react(), diagnosticRewrite()],
+  plugins: [react(), cleanRouteRewrite()],
   server: {
     port: 5173,
     open: false,
@@ -41,8 +46,10 @@ export default defineConfig({
       input: {
         // The free Sold-Out Gap Calculator (unchanged).
         main: "index.html",
-        // The new Sold-Out Stage Diagnostic V0.
+        // The Sold-Out Stage Diagnostic V0.
         diagnostic: "diagnostic.html",
+        // The Sold-Out Snapshot Generator V0 (internal builder + founder view).
+        snapshot: "snapshot.html",
       },
     },
   },

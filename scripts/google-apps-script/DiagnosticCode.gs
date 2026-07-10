@@ -22,22 +22,98 @@
 const SHEET_NAME = 'Diagnostics';
 
 // Internal review columns, always kept at the right edge of the sheet.
+// These are the Snapshot Generator's scoring/routing + manual-override fields.
+// All are safe to edit by hand in the sheet; auto-scoring only fills a few.
 const INTERNAL_COLUMNS = [
   'Estimated Stage',
   'Paid Fit Score',
   'Revenue Gap',
   'Primary Growth Lever',
   'Primary Bottleneck',
+  'Secondary Bottleneck',
   'Recommended Sold-Out Engine',
   'Fit Status',
   'Notes',
+  'Next Step',
   'Follow-Up Status',
 ];
 
+// Max rows the /snapshot builder pulls when listing submissions.
+const LIST_LIMIT = 100;
+
+// Script Property name holding the shared access key for listing submissions.
+// Set it once (see setListAccessKey below) so only your team can pull data.
+const LIST_KEY_PROP = 'LIST_KEY';
+
 // ---------- Entry points ---------------------------------------------------
 
-function doGet() {
+function doGet(e) {
+  const mode = e && e.parameter ? e.parameter.mode : '';
+  if (mode === 'list') {
+    return listSubmissions_(e);
+  }
   return jsonOut_({ ok: true, message: 'Sold-Out Stage Diagnostic endpoint is live.' });
+}
+
+/**
+ * Return recent submissions as JSON so the Snapshot Generator (/snapshot) can
+ * pre-fill the builder. Read-only. Most-recent first.
+ *
+ * Access-gated: requires ?key= to match the LIST_KEY Script Property. This keeps
+ * random visitors from pulling everyone's submissions. It is NOT a login system
+ * — just one shared team key. Submitting the diagnostic (doPost) is unaffected.
+ */
+function listSubmissions_(e) {
+  const provided = e && e.parameter ? e.parameter.key : '';
+  const expected = PropertiesService.getScriptProperties().getProperty(LIST_KEY_PROP);
+
+  if (!expected) {
+    return jsonOut_({
+      ok: false,
+      error:
+        'List access key not configured. Run setListAccessKey once in the ' +
+        'Apps Script editor to set a LIST_KEY, then redeploy.',
+    });
+  }
+  if (String(provided) !== String(expected)) {
+    return jsonOut_({ ok: false, error: 'Invalid access key.' });
+  }
+
+  try {
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+    const sheet = ss.getSheetByName(SHEET_NAME);
+    if (!sheet || sheet.getLastRow() < 2) {
+      return jsonOut_({ ok: true, rows: [] });
+    }
+
+    const headers = readHeaders_(sheet);
+    const lastRow = sheet.getLastRow();
+    const numData = lastRow - 1;
+    const take = Math.min(LIST_LIMIT, numData);
+    const startRow = lastRow - take + 1;
+
+    const values = sheet.getRange(startRow, 1, take, headers.length).getValues();
+    const rows = [];
+    for (let i = 0; i < values.length; i++) {
+      const rowValues = values[i];
+      const map = {};
+      for (let c = 0; c < headers.length; c++) {
+        const cell = rowValues[c];
+        map[headers[c]] = cell instanceof Date ? cell.toISOString() : String(cell);
+      }
+      const ts = rowValues[0];
+      rows.push({
+        rowIndex: startRow + i,
+        timestamp: ts instanceof Date ? ts.toISOString() : String(ts),
+        values: map,
+      });
+    }
+    rows.reverse(); // most recent first
+    return jsonOut_({ ok: true, rows: rows });
+  } catch (err) {
+    Logger.log(err);
+    return jsonOut_({ ok: false, error: String(err) });
+  }
 }
 
 function doPost(e) {
@@ -347,6 +423,21 @@ function jsonOut_(obj) {
 function num_(n) {
   const x = Number(String(n == null ? '' : n).replace(/[^0-9.\-]/g, ''));
   return isFinite(x) ? x : 0;
+}
+
+// ---------- One-off setup from the Apps Script editor ----------------------
+
+/**
+ * Set the shared access key that the /snapshot builder must provide to list
+ * submissions. Edit the value below, Run this once, then redeploy a New version.
+ *
+ * Pick anything hard to guess (e.g. a long random string). Share it only with
+ * your team — they'll paste it into the builder's "access key" field once.
+ */
+function setListAccessKey() {
+  const KEY = 'whereismy20k?';
+  PropertiesService.getScriptProperties().setProperty(LIST_KEY_PROP, KEY);
+  Logger.log('LIST_KEY set. Team access key is now: ' + KEY);
 }
 
 // ---------- One-off test from the Apps Script editor -----------------------

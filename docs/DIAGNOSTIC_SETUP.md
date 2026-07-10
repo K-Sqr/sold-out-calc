@@ -105,5 +105,18 @@ Open `scripts/google-apps-script/DiagnosticCode.gs` and edit:
 Save, then **Deploy → Manage deployments → Edit → New version** to publish the
 change. No frontend redeploy needed.
 
-`Notes` and `Follow-Up Status` are intentionally left blank for your team to
-fill in during review.
+The internal review columns are: **Estimated Stage, Paid Fit Score, Revenue Gap,
+Primary Growth Lever, Primary Bottleneck, Secondary Bottleneck, Recommended
+Sold-Out Engine, Fit Status, Notes, Next Step, Follow-Up Status**.
+
+`Secondary Bottleneck`, `Notes`, `Next Step`, and `Follow-Up Status` are
+intentionally left blank for your team to fill in during review.
+
+> **Already deployed an earlier version?** The new columns
+> (`Secondary Bottleneck`, `Next Step`) and the submission-list endpoint used by
+> the Snapshot Generator only take effect after you **re-paste `DiagnosticCode.gs`
+> and publish a New version**. Existing sheets keep their old columns — add the
+> two new headers by hand (or start a fresh sheet) if you want them populated.
+
+See **`docs/SNAPSHOT_SETUP.md`** for how the `/snapshot` Snapshot Generator uses
+these fields.

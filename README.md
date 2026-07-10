@@ -193,3 +193,25 @@ one editable place: `scoreSubmission_` in `DiagnosticCode.gs`.
 
 Set `VITE_DIAGNOSTIC_ENDPOINT_URL` (see `docs/DIAGNOSTIC_SETUP.md`). Without it,
 the form runs in demo mode: fully usable, but nothing is saved.
+
+## Sold-Out Snapshot Generator V0 (`/snapshot`)
+
+A lightweight internal + founder-facing layer on top of the diagnostic. The team
+reviews a submission, assigns/edits the routing (stage, paid-fit, revenue gap,
+primary/secondary bottleneck, recommended engine, fit status, notes, next step),
+scores 10 categories, and generates a clean, branded **"Your Sold-Out Snapshot"**
+to send the founder.
+
+- **Internal builder:** `/snapshot` — review, score, and manually override
+  everything (the diagnostic logic is still being validated).
+- **Founder view:** `/snapshot?s=<token>` — the shareable link *is* the snapshot;
+  no login or database. Internal notes/fit score/scorecard never leave with the
+  founder.
+- **Load from sheet** *(optional)* reuses `VITE_DIAGNOSTIC_ENDPOINT_URL` to
+  pre-fill from recent submissions; otherwise it's manual entry.
+
+Third Vite entry (`snapshot.html` → `src/snapshot/`). All routing labels live in
+`src/snapshot/constants.ts`. Full guide: `docs/SNAPSHOT_SETUP.md`.
+
+> Not built here (by design): accounts, payment, Shopify/Klaviyo, a dashboard, or
+> the actual Sold-Out Engines — only the routing labels and the snapshot.
