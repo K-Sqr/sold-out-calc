@@ -307,7 +307,7 @@ function Insight() {
         Insight
       </div>
       <p className="mt-2 font-serif text-2xl sm:text-[28px] text-ink-900 leading-snug tracking-tightish">
-        Followers don't forecast demand.{" "}
+        Followers aren't buyers.{" "}
         <em className="italic text-accent-ink">Warm buyers do.</em>
       </p>
       <p className="mt-3 text-[14.5px] text-ink-400 leading-relaxed max-w-xl">
