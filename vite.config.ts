@@ -7,7 +7,7 @@ import react from "@vitejs/plugin-react";
  * work the same everywhere.
  */
 function cleanRouteRewrite(): Plugin {
-  const routes = ["diagnostic", "snapshot"];
+  const routes = ["diagnostic", "snapshot", "labs"];
   const rewrite = (req: { url?: string | undefined }) => {
     const url = req.url ?? "";
     for (const route of routes) {
@@ -50,6 +50,8 @@ export default defineConfig({
         diagnostic: "diagnostic.html",
         // The Sold-Out Snapshot Generator V0 (internal builder + founder view).
         snapshot: "snapshot.html",
+        // Sold-Out Labs coming-soon / waitlist page (static, no React).
+        labs: "labs.html",
       },
     },
   },

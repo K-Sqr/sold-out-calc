@@ -1,6 +1,6 @@
 # Sold-Out Gap Calculator
 
-> A free tool by **The Sold-Out System** — for fashion creators, designers, and small fashion brands launching clothing drops.
+> A free tool by **Sold-Out Labs** — for fashion creators, designers, and small fashion brands launching clothing drops.
 
 The Sold-Out Gap Calculator answers one emotionally useful question:
 

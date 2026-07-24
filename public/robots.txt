@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /snapshot
+
+Sitemap: https://sold-out-calc.vercel.app/sitemap.xml

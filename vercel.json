@@ -1,5 +1,16 @@
 {
   "rewrites": [
+    {
+      "source": "/",
+      "has": [{ "type": "host", "value": "soldoutlabs.com" }],
+      "destination": "/labs.html"
+    },
+    {
+      "source": "/",
+      "has": [{ "type": "host", "value": "www.soldoutlabs.com" }],
+      "destination": "/labs.html"
+    },
+    { "source": "/labs", "destination": "/labs.html" },
     { "source": "/diagnostic", "destination": "/diagnostic.html" },
     { "source": "/snapshot", "destination": "/snapshot.html" }
   ]

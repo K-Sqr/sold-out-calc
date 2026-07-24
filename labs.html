@@ -1,0 +1,503 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#FBF9F5" />
+
+    <title>Sold-Out Labs — Tools for people who run drops</title>
+    <meta
+      name="description"
+      content="Sold-Out Labs builds tools for people who run drops. The first one is live: the Sold-Out Gap Calculator. Leave your email to hear about the next one first."
+    />
+    <link rel="canonical" href="https://sold-out-calc.vercel.app/labs" />
+
+    <meta property="og:site_name" content="Sold-Out Labs" />
+    <meta property="og:title" content="Sold-Out Labs" />
+    <meta
+      property="og:description"
+      content="We build tools for people who run drops. The first one is live: the Sold-Out Gap Calculator."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://sold-out-calc.vercel.app/labs" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Sold-Out Labs" />
+    <meta
+      name="twitter:description"
+      content="We build tools for people who run drops. The first one is live: the Sold-Out Gap Calculator."
+    />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,400..600,0..100;1,9..144,400..600,0..100&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Sold-Out Labs",
+        "url": "https://sold-out-calc.vercel.app/labs",
+        "description": "Sold-Out Labs builds tools for people who run drops.",
+        "logo": "https://sold-out-calc.vercel.app/favicon.svg"
+      }
+    </script>
+
+    <style>
+      :root {
+        color-scheme: light;
+        --cream-50: #fbf9f5;
+        --ink-100: #e8e5e0;
+        --ink-200: #c4bfb8;
+        --ink-400: #6b6864;
+        --ink-800: #1a1916;
+        --ink-900: #0e0d0b;
+        --accent: #c2562a;
+        --accent-ink: #7a3318;
+        --success: #3f6e4a;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+      }
+      body {
+        background: var(--cream-50);
+        color: var(--ink-800);
+        font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+        font-feature-settings: "ss01", "cv11";
+        min-height: 100svh;
+        display: flex;
+        flex-direction: column;
+      }
+      ::selection {
+        background: var(--ink-900);
+        color: var(--cream-50);
+      }
+      .container {
+        width: 100%;
+        max-width: 44rem;
+        margin: 0 auto;
+        padding: 0 1.25rem;
+      }
+      .serif {
+        font-family: "Fraunces", ui-serif, Georgia, serif;
+        font-variation-settings: "SOFT" 40, "WONK" 0;
+      }
+
+      /* Header */
+      header {
+        padding-top: 1.5rem;
+      }
+      .wordmark {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--ink-900);
+        text-decoration: none;
+      }
+      .wordmark-badge {
+        height: 1.75rem;
+        width: 1.75rem;
+        border-radius: 0.5rem;
+        background: var(--ink-900);
+        color: var(--cream-50);
+        display: grid;
+        place-items: center;
+        font-family: "Fraunces", Georgia, serif;
+        font-style: italic;
+        font-size: 15px;
+      }
+      .wordmark-name {
+        font-size: 13px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        font-weight: 500;
+      }
+
+      /* Hero */
+      main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 3.5rem 0 3rem;
+        text-align: center;
+      }
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        font-size: 11px;
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+        color: var(--ink-400);
+        font-weight: 500;
+      }
+      .eyebrow::before,
+      .eyebrow::after {
+        content: "";
+        height: 1px;
+        width: 1.5rem;
+        background: var(--ink-200);
+      }
+      .eyebrow .dot {
+        display: inline-block;
+        height: 4px;
+        width: 4px;
+        border-radius: 50%;
+        background: var(--accent);
+        margin-right: 0.5rem;
+      }
+      h1 {
+        margin-top: 1.75rem;
+        font-size: clamp(38px, 9vw, 60px);
+        line-height: 1.05;
+        letter-spacing: -0.035em;
+        font-weight: 500;
+        color: var(--ink-900);
+      }
+      h1 em {
+        font-style: italic;
+        color: var(--accent-ink);
+        font-variation-settings: "SOFT" 60, "opsz" 144;
+      }
+      .sub {
+        margin: 1.25rem auto 0;
+        max-width: 34rem;
+        font-size: 16px;
+        line-height: 1.65;
+        color: var(--ink-400);
+      }
+      .sub strong {
+        color: var(--ink-800);
+        font-weight: 600;
+      }
+      .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        margin-top: 2rem;
+        background: var(--ink-900);
+        color: var(--cream-50);
+        padding: 0.875rem 1.5rem;
+        border-radius: 999px;
+        font-weight: 500;
+        font-size: 15px;
+        letter-spacing: -0.02em;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        transition: background 0.2s, transform 0.1s;
+      }
+      .btn-primary:hover {
+        background: var(--ink-800);
+      }
+      .btn-primary:active {
+        transform: scale(0.98);
+      }
+      .btn-primary svg {
+        transition: transform 0.3s;
+      }
+      .btn-primary:hover svg {
+        transform: translateX(2px);
+      }
+
+      /* Waitlist card */
+      .waitlist {
+        margin-top: 3.5rem;
+        background: #fff;
+        border: 1px solid var(--ink-100);
+        border-radius: 1.5rem;
+        padding: 1.75rem 1.5rem;
+        box-shadow: 0 1px 0 rgba(14, 13, 11, 0.04),
+          0 6px 14px -8px rgba(14, 13, 11, 0.1);
+        text-align: left;
+      }
+      .waitlist p.lead {
+        font-size: 15px;
+        line-height: 1.6;
+        color: var(--ink-800);
+      }
+      .waitlist form {
+        margin-top: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.625rem;
+      }
+      .waitlist input[type="email"] {
+        width: 100%;
+        background: #fff;
+        border: 1px solid var(--ink-100);
+        border-radius: 0.75rem;
+        padding: 0.875rem 1rem;
+        font-size: 15px;
+        font-family: inherit;
+        color: var(--ink-900);
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+      }
+      .waitlist input[type="email"]::placeholder {
+        color: var(--ink-200);
+      }
+      .waitlist input[type="email"]:focus {
+        border-color: var(--ink-800);
+        box-shadow: 0 0 0 4px rgba(14, 13, 11, 0.06);
+      }
+      .waitlist .btn-primary {
+        margin-top: 0;
+        width: 100%;
+      }
+      .waitlist .fine {
+        margin-top: 0.75rem;
+        font-size: 12px;
+        color: var(--ink-400);
+      }
+      @media (min-width: 480px) {
+        .waitlist {
+          padding: 2rem;
+        }
+        .waitlist form {
+          flex-direction: row;
+        }
+        .waitlist input[type="email"] {
+          flex: 1;
+        }
+        .waitlist .btn-primary {
+          width: auto;
+          flex-shrink: 0;
+        }
+      }
+      .confirmation {
+        display: none;
+        margin-top: 1rem;
+        align-items: flex-start;
+        gap: 0.5rem;
+        font-size: 14.5px;
+        line-height: 1.5;
+        color: var(--success);
+      }
+      .confirmation svg {
+        flex-shrink: 0;
+        margin-top: 2px;
+      }
+      .waitlist.done form,
+      .waitlist.done .fine {
+        display: none;
+      }
+      .waitlist.done .confirmation {
+        display: flex;
+      }
+      .form-error {
+        display: none;
+        margin-top: 0.625rem;
+        font-size: 12.5px;
+        color: #a23a2a;
+      }
+      /* Honeypot — hidden from humans, visible to naive bots. */
+      .hp-field {
+        position: absolute;
+        left: -9999px;
+        opacity: 0;
+        height: 0;
+        width: 0;
+        overflow: hidden;
+      }
+
+      /* Footer */
+      footer {
+        padding: 2.5rem 0;
+        text-align: center;
+      }
+      .divider {
+        height: 1px;
+        width: 100%;
+        background: linear-gradient(
+          to right,
+          transparent,
+          var(--ink-100),
+          transparent
+        );
+        margin-bottom: 1.5rem;
+      }
+      footer p {
+        font-size: 11.5px;
+        color: var(--ink-200);
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <a href="/labs" class="wordmark" aria-label="Sold-Out Labs">
+          <span class="wordmark-badge">S</span>
+          <span class="wordmark-name">Sold-Out Labs</span>
+        </a>
+      </div>
+    </header>
+
+    <main>
+      <div class="container">
+        <p class="eyebrow"><span class="dot"></span>More tools coming</p>
+
+        <h1 class="serif">We build tools for people who <em>run drops.</em></h1>
+
+        <p class="sub">
+          The first one is live: the
+          <strong>Sold-Out Gap Calculator</strong> — it tells you how many warm
+          buyers you need before your next drop.
+        </p>
+
+        <a href="/?ref=labs&utm_source=labs" class="btn-primary">
+          Open the Sold-Out Gap Calculator
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true">
+            <path
+              d="M3 8h10m0 0L8.5 3.5M13 8l-4.5 4.5"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            />
+          </svg>
+        </a>
+
+        <div class="waitlist" id="waitlist">
+          <p class="lead">
+            More tools coming. Leave your email if you want them first.
+          </p>
+
+          <!--
+            Email capture posts to a Google Apps Script bound to a Google Sheet
+            (same setup as the calculator's report capture). Works with JS
+            disabled: the browser posts the form natively and the script
+            returns a styled confirmation page.
+
+            Setup: docs/LABS_WAITLIST_SETUP.md — replace the action URL below
+            with your deployed Apps Script web app URL.
+          -->
+          <form
+            id="waitlist-form"
+            method="POST"
+            action="https://script.google.com/macros/s/AKfycbzAaSLlc9tDj0Vf8LcMcTqHN5YD6JWQaOA7dzXIaNGnQkXUd6rycVAF60D_yq9hCGMq/exec"
+          >
+            <input type="hidden" name="source" value="labs-coming-soon" />
+            <input type="hidden" name="ref" id="ref-field" value="" />
+            <input type="hidden" name="page" id="page-field" value="/labs" />
+            <!-- Honeypot: real users never see or fill this. -->
+            <div class="hp-field" aria-hidden="true">
+              <label for="company">Company</label>
+              <input
+                type="text"
+                id="company"
+                name="company"
+                tabindex="-1"
+                autocomplete="off"
+              />
+            </div>
+
+            <label class="hp-field" for="waitlist-email">Email</label>
+            <input
+              id="waitlist-email"
+              type="email"
+              name="email"
+              required
+              placeholder="you@yourbrand.com"
+              autocomplete="email"
+              inputmode="email"
+            />
+            <button type="submit" class="btn-primary" id="waitlist-submit">
+              Notify me
+            </button>
+          </form>
+
+          <p class="form-error" id="form-error" role="alert">
+            Something went wrong. Please try again.
+          </p>
+
+          <p class="fine">No spam. We'll only email when there's something real.</p>
+
+          <p class="confirmation" role="status">
+            <svg width="15" height="15" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <path
+                d="M3 7.5l2.8 2.8L11 4.5"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+            You're on the list. We'll only email when there's something real.
+          </p>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <div class="container">
+        <div class="divider"></div>
+        <p>© <span id="year">2026</span> Sold-Out Labs</p>
+      </div>
+    </footer>
+
+    <script>
+      // Progressive enhancement only — the form posts natively without JS.
+      (function () {
+        document.getElementById("year").textContent = new Date().getFullYear();
+
+        // Carry the ad/traffic tag through to the sheet.
+        var params = new URLSearchParams(window.location.search);
+        document.getElementById("ref-field").value = params.get("ref") || "";
+        document.getElementById("page-field").value = window.location.href;
+
+        var form = document.getElementById("waitlist-form");
+        var card = document.getElementById("waitlist");
+        var button = document.getElementById("waitlist-submit");
+        var errorEl = document.getElementById("form-error");
+
+        // If the endpoint isn't configured yet, leave the native flow alone
+        // (it will fail loudly instead of pretending to work).
+        if (form.action.indexOf("PASTE_YOUR_DEPLOYMENT_ID") !== -1) return;
+
+        form.addEventListener("submit", function (e) {
+          e.preventDefault();
+          errorEl.style.display = "none";
+          button.disabled = true;
+          button.textContent = "Adding you…";
+
+          var body = new URLSearchParams(new FormData(form));
+          body.set("format", "json");
+
+          fetch(form.action, { method: "POST", body: body })
+            .then(function (res) {
+              if (!res.ok) throw new Error("HTTP " + res.status);
+              return res.json().catch(function () {
+                return { ok: true };
+              });
+            })
+            .then(function (data) {
+              if (data && data.ok === false) throw new Error(data.error);
+              card.classList.add("done");
+            })
+            .catch(function () {
+              button.disabled = false;
+              button.textContent = "Notify me";
+              errorEl.style.display = "block";
+            });
+        });
+      })();
+    </script>
+
+    <!-- Vercel Web Analytics (static page variant). -->
+    <script defer src="/_vercel/insights/script.js"></script>
+  </body>
+</html>

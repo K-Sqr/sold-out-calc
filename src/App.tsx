@@ -119,13 +119,13 @@ function Header() {
       <a
         href="/"
         className="inline-flex items-center gap-2 text-ink-900"
-        aria-label="The Sold-Out System"
+        aria-label="Sold-Out Labs"
       >
         <span className="h-7 w-7 rounded-lg bg-ink-900 grid place-items-center text-cream-50 font-serif italic text-[15px]">
           S
         </span>
         <span className="text-[13px] tracking-[0.18em] uppercase font-medium">
-          The Sold-Out System
+          Sold-Out Labs
         </span>
       </a>
       <a

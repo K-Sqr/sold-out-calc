@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "A free tool by The Sold-Out System to help fashion founders forecast warm demand before launch day.",
+  "description": "A free tool by Sold-Out Labs to help fashion founders forecast warm demand before launch day.",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",

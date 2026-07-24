@@ -17,7 +17,7 @@ export function Hero({ onStart }: HeroProps) {
           <span className="h-px w-6 bg-ink-200" aria-hidden />
           <span className="inline-flex items-center gap-2">
             <span className="inline-block h-1 w-1 rounded-full bg-accent" />
-            A free tool by The Sold-Out System
+            A free tool by Sold-Out Labs
           </span>
           <span className="h-px w-6 bg-ink-200" aria-hidden />
         </div>

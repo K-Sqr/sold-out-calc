@@ -12,8 +12,8 @@
 const SHEET_NAME = 'Leads';
 
 // Branding shown in the email + sheet.
-const BRAND_NAME = 'The Sold-Out System';
-const FROM_NAME = 'The Sold-Out System';
+const BRAND_NAME = 'Sold-Out Labs';
+const FROM_NAME = 'Sold-Out Labs';
 const EMAIL_SUBJECT = 'Your Sold-Out Gap Forecast';
 
 // Optional: where the "Recalculate" button in the email should link to.
