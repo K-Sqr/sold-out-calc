@@ -10,7 +10,7 @@ Site structure (project renamed to `sold-out-labs.vercel.app`; the old
 | Route | Page |
 | --- | --- |
 | `/` | Sold-Out Labs coming-soon + waitlist |
-| `/calc` | Sold-Out Gap Calculator |
+| `/SoldOutGap` | Sold-Out Gap Calculator (`/calc` and `/soldoutgap` redirect here) |
 | `/diagnostic` | Stage Diagnostic |
 | `/snapshot` | Snapshot Generator (internal, not indexed) |
 | `/labs` | 301 redirect to `/` (kept because it was already submitted to Google) |
@@ -99,7 +99,7 @@ Use these links directly:
 | Page | URL |
 | --- | --- |
 | Labs coming-soon page | `https://sold-out-labs.vercel.app/` |
-| Calculator | `https://sold-out-labs.vercel.app/calc` |
+| Calculator | `https://sold-out-labs.vercel.app/SoldOutGap` |
 
 **There is nothing to configure.** Every URL in the codebase (canonical
 tags, `og:url`, JSON-LD, `robots.txt`, `sitemap.xml`, the Apps Script
@@ -130,11 +130,11 @@ URL is still very plausible.
    Follow the DNS instructions it gives you.
 3. No routing config needed — the coming-soon page is already the site
    root, so `soldoutlabs.com/` serves it automatically and the calculator
-   sits at `soldoutlabs.com/calc`.
+   sits at `soldoutlabs.com/SoldOutGap`.
 4. After the domain is live, update the hardcoded URLs from
    `https://sold-out-labs.vercel.app` to `https://soldoutlabs.com` in:
    - `index.html` — the `<link rel="canonical">`, `og:url`, and JSON-LD block
-   - `calc.html` — the `<link rel="canonical">`
+   - `SoldOutGap.html` — the `<link rel="canonical">`
    - `public/sitemap.xml` and `public/robots.txt`
    - `scripts/google-apps-script/LabsWaitlist.gs` — `LABS_URL` and
      `scripts/google-apps-script/Code.gs` — `TOOL_URL` (then redeploy both)
@@ -173,14 +173,14 @@ the calculator's footer. What's left is telling Google the page exists:
    > verifies any property you add.
 
    The **HTML tag** method (a `<meta name="google-site-verification">` tag
-   pasted into the `<head>` of both `index.html` and `calc.html`) works too.
+   pasted into the `<head>` of both `index.html` and `SoldOutGap.html`) works too.
    The DNS method won't work here since the `vercel.app` domain isn't yours.
 3. **Sitemaps → Add a new sitemap** → enter `sitemap.xml` → Submit.
 4. **URL Inspection** → paste `https://sold-out-labs.vercel.app/` →
    **Request Indexing**. This is the lever that matters for the weekend
    deadline — it usually gets a page indexed within
    hours-to-a-couple-of-days instead of weeks.
-5. Repeat Request Indexing for `https://sold-out-labs.vercel.app/calc`.
+5. Repeat Request Indexing for `https://sold-out-labs.vercel.app/SoldOutGap`.
 
 ### If you're on soldoutlabs.com (Option B)
 

@@ -1,9 +1,23 @@
 {
   "redirects": [
+    {
+      "source": "/",
+      "has": [{ "type": "host", "value": "sold-out-calc.vercel.app" }],
+      "destination": "https://sold-out-labs.vercel.app/SoldOutGap",
+      "permanent": false
+    },
+    {
+      "source": "/:path(.*)",
+      "has": [{ "type": "host", "value": "sold-out-calc.vercel.app" }],
+      "destination": "https://sold-out-labs.vercel.app/:path",
+      "permanent": false
+    },
+    { "source": "/calc", "destination": "/SoldOutGap", "permanent": true },
+    { "source": "/soldoutgap", "destination": "/SoldOutGap", "permanent": true },
     { "source": "/labs", "destination": "/", "permanent": true }
   ],
   "rewrites": [
-    { "source": "/calc", "destination": "/calc.html" },
+    { "source": "/SoldOutGap", "destination": "/SoldOutGap.html" },
     { "source": "/diagnostic", "destination": "/diagnostic.html" },
     { "source": "/snapshot", "destination": "/snapshot.html" }
   ]

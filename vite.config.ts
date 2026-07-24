@@ -7,7 +7,7 @@ import react from "@vitejs/plugin-react";
  * work the same everywhere.
  */
 function cleanRouteRewrite(): Plugin {
-  const routes = ["calc", "diagnostic", "snapshot"];
+  const routes = ["SoldOutGap", "diagnostic", "snapshot"];
   const rewrite = (req: { url?: string | undefined }) => {
     const url = req.url ?? "";
     for (const route of routes) {
@@ -47,7 +47,7 @@ export default defineConfig({
         // Sold-Out Labs coming-soon page — the site root (static, no React).
         main: "index.html",
         // The free Sold-Out Gap Calculator.
-        calc: "calc.html",
+        soldOutGap: "SoldOutGap.html",
         // The Sold-Out Stage Diagnostic V0.
         diagnostic: "diagnostic.html",
         // The Sold-Out Snapshot Generator V0 (internal builder + founder view).

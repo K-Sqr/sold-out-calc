@@ -18,7 +18,7 @@ const EMAIL_SUBJECT = 'Your Sold-Out Gap Forecast';
 
 // Optional: where the "Recalculate" button in the email should link to.
 // If empty, the script falls back to the page the user submitted from.
-const TOOL_URL = 'https://sold-out-labs.vercel.app/calc';
+const TOOL_URL = 'https://sold-out-labs.vercel.app/SoldOutGap';
 
 // Optional: where the "Get a Free Drop Leak Check" button should link.
 const DROP_LEAK_CHECK_URL = '';
@@ -468,7 +468,7 @@ function runSelfTest() {
         phone: '',
         submittedAt: new Date().toISOString(),
         sourceUrl: 'https://example.com/test',
-        reportUrl: 'https://sold-out-labs.vercel.app/calc?goal=10000&aov=120&email=500&sms=150&ig=300&vip=100&followers=50000&days=14',
+        reportUrl: 'https://sold-out-labs.vercel.app/SoldOutGap?goal=10000&aov=120&email=500&sms=150&ig=300&vip=100&followers=50000&days=14',
         inputs: {
           revenueGoal: 10000,
           averageOrderValue: 120,
