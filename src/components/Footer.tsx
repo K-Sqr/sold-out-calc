@@ -9,7 +9,7 @@ export function Footer() {
         Built to help fashion founders make better launch decisions — without
         the overwhelm.{" "}
         <a
-          href="/labs"
+          href="/"
           className="text-ink-400 underline underline-offset-2 hover:text-ink-900 transition-colors"
         >
           More tools coming

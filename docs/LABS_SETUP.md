@@ -1,8 +1,19 @@
 # Sold-Out Labs — Coming-Soon Page Setup
 
-The page lives at `/labs` (`labs.html`). It is a static page — no React, no
-framework JS — so it loads fast and the email capture works even with
-JavaScript blocked.
+The coming-soon page is the **site root** (`index.html`). It is a static
+page — no React, no framework JS — so it loads fast and the email capture
+works even with JavaScript blocked.
+
+Site structure (project renamed to `sold-out-labs.vercel.app`; the old
+`sold-out-calc.vercel.app` redirects here):
+
+| Route | Page |
+| --- | --- |
+| `/` | Sold-Out Labs coming-soon + waitlist |
+| `/calc` | Sold-Out Gap Calculator |
+| `/diagnostic` | Stage Diagnostic |
+| `/snapshot` | Snapshot Generator (internal, not indexed) |
+| `/labs` | 301 redirect to `/` (kept because it was already submitted to Google) |
 
 Three things need doing before the ad goes out:
 
@@ -35,7 +46,7 @@ Free, exportable to CSV/Mailchimp/ConvertKit any time, no third-party account.
    - Who has access: **Anyone**
 4. Copy the web app URL (looks like
    `https://script.google.com/macros/s/AKfy.../exec`).
-5. In `labs.html`, find the form and replace the placeholder action URL:
+5. In `index.html`, find the form and replace the placeholder action URL:
 
    ```html
    <form id="waitlist-form" method="POST"
@@ -44,7 +55,7 @@ Free, exportable to CSV/Mailchimp/ConvertKit any time, no third-party account.
 
 6. In the Apps Script editor, run `runSelfTest` once and confirm a row lands
    in the `Waitlist` tab.
-7. Deploy the site. Submit a real email on `/labs` and check the sheet.
+7. Deploy the site. Submit a real email on the homepage and check the sheet.
 
 Also test the no-JS path once: submit the form with JS disabled (or just
 open the form action URL flow) — you should get a styled "You're on the
@@ -87,18 +98,17 @@ Use these links directly:
 
 | Page | URL |
 | --- | --- |
-| Calculator | `https://sold-out-calc.vercel.app/` |
-| Labs coming-soon page | `https://sold-out-calc.vercel.app/labs` |
+| Labs coming-soon page | `https://sold-out-labs.vercel.app/` |
+| Calculator | `https://sold-out-labs.vercel.app/calc` |
 
 **There is nothing to configure.** Every URL in the codebase (canonical
 tags, `og:url`, JSON-LD, `robots.txt`, `sitemap.xml`, the Apps Script
-`LABS_URL`) already points at `sold-out-calc.vercel.app`, and production
+`LABS_URL`) already points at `sold-out-labs.vercel.app`, and production
 `.vercel.app` domains are fully indexable by Google (only Vercel *preview*
-deployments get a noindex header). The calculator's homepage title already
-contains "Sold-Out Labs", so the brand name is searchable on both pages.
+deployments get a noindex header).
 
-For the ad / IG bio, link to `https://sold-out-calc.vercel.app/labs` (or
-the calculator root — the footer links between them either way).
+For the ad / IG bio, link to `https://sold-out-labs.vercel.app/` — the
+coming-soon page has a corner link to the calculator.
 
 Then do the Search Console steps in
 [section 3, "Using the vercel.app URL"](#if-youre-using-the-vercelapp-url-option-a) —
@@ -115,25 +125,22 @@ URL is still very plausible.
 
 1. Buy `soldoutlabs.com` (Namecheap, Cloudflare, or straight from Vercel —
    buying through Vercel skips the DNS steps).
-2. Vercel dashboard → the `sold-out-calc` project → **Settings → Domains →
-   Add** → `soldoutlabs.com` (and `www.soldoutlabs.com`, redirected to the
-   apex). Follow the DNS instructions it gives you.
-3. That's it for routing — `vercel.json` is already configured so that
-   **`soldoutlabs.com/` serves the Labs page** while the calculator stays at
-   the root of `sold-out-calc.vercel.app`:
-
-   ```json
-   { "source": "/", "has": [{ "type": "host", "value": "soldoutlabs.com" }], "destination": "/labs.html" }
-   ```
-
+2. Vercel dashboard → the project → **Settings → Domains → Add** →
+   `soldoutlabs.com` (and `www.soldoutlabs.com`, redirected to the apex).
+   Follow the DNS instructions it gives you.
+3. No routing config needed — the coming-soon page is already the site
+   root, so `soldoutlabs.com/` serves it automatically and the calculator
+   sits at `soldoutlabs.com/calc`.
 4. After the domain is live, update the hardcoded URLs from
-   `https://sold-out-calc.vercel.app/labs` to `https://soldoutlabs.com/` in:
-   - `labs.html` — the `<link rel="canonical">`, `og:url`, and JSON-LD block
+   `https://sold-out-labs.vercel.app` to `https://soldoutlabs.com` in:
+   - `index.html` — the `<link rel="canonical">`, `og:url`, and JSON-LD block
+   - `calc.html` — the `<link rel="canonical">`
    - `public/sitemap.xml` and `public/robots.txt`
-   - `scripts/google-apps-script/LabsWaitlist.gs` — `LABS_URL` (then redeploy it)
+   - `scripts/google-apps-script/LabsWaitlist.gs` — `LABS_URL` and
+     `scripts/google-apps-script/Code.gs` — `TOOL_URL` (then redeploy both)
 
 Until the domain is bought, everything works at
-`https://sold-out-calc.vercel.app/labs` — put that in the ad if the domain
+`https://sold-out-labs.vercel.app/` — put that in the ad if the domain
 isn't ready in time.
 
 ---
@@ -147,28 +154,33 @@ the calculator's footer. What's left is telling Google the page exists:
 
 ### If you're using the vercel.app URL (Option A)
 
+> After the project rename, add a **new** URL-prefix property for
+> `https://sold-out-labs.vercel.app/` — the old `sold-out-calc` property
+> now points at a redirecting domain. The verification file works for both.
+
 1. Go to [Google Search Console](https://search.google.com/search-console)
    → **Add property** → choose **URL prefix** (not Domain — you don't own
-   `vercel.app`) → enter `https://sold-out-calc.vercel.app/`.
+   `vercel.app`) → enter `https://sold-out-labs.vercel.app/`.
 2. Verify ownership. Search Console's default is the **HTML file** method:
    it gives you a file like `google5fff8f9c303df6e0.html` to serve from the
    site root. Drop it into `public/` (Vite copies everything there to the
    deployed root) and deploy — it's then live at
-   `https://sold-out-calc.vercel.app/google5fff8f9c303df6e0.html`. Click
+   `https://sold-out-labs.vercel.app/google5fff8f9c303df6e0.html`. Click
    **Verify**. Don't delete the file afterwards; Google re-checks it.
 
-   > Ours is already committed at `public/google5fff8f9c303df6e0.html`.
+   > Ours is already committed at `public/google5fff8f9c303df6e0.html`,
+   > and the token is tied to your Google account, so the same file
+   > verifies any property you add.
 
    The **HTML tag** method (a `<meta name="google-site-verification">` tag
-   pasted into the `<head>` of both `index.html` and `labs.html`) works too.
+   pasted into the `<head>` of both `index.html` and `calc.html`) works too.
    The DNS method won't work here since the `vercel.app` domain isn't yours.
 3. **Sitemaps → Add a new sitemap** → enter `sitemap.xml` → Submit.
-4. **URL Inspection** → paste `https://sold-out-calc.vercel.app/labs` →
+4. **URL Inspection** → paste `https://sold-out-labs.vercel.app/` →
    **Request Indexing**. This is the lever that matters for the weekend
    deadline — it usually gets a page indexed within
    hours-to-a-couple-of-days instead of weeks.
-5. Repeat Request Indexing for `https://sold-out-calc.vercel.app/` since
-   its title changed to "Sold-Out Labs".
+5. Repeat Request Indexing for `https://sold-out-labs.vercel.app/calc`.
 
 ### If you're on soldoutlabs.com (Option B)
 
@@ -187,12 +199,13 @@ is the best available play. Backup: whoever asks gets the link in the IG bio.
 ### Analytics
 
 - The calculator already uses Vercel Analytics (`@vercel/analytics`).
-- `labs.html` includes the static-page equivalent
+- The coming-soon page (`index.html`) includes the static-page equivalent
   (`/_vercel/insights/script.js`). It reports automatically as long as
   **Analytics is enabled** for the project in the Vercel dashboard
   (Project → Analytics → Enable, if it isn't already).
-- Traffic tagging: the Labs page button links to the calculator with
-  `?ref=labs&utm_source=labs`. Give the ad its own tag, e.g.
-  `?ref=ig-ad-1&utm_source=ig-ad`, so ad-driven and labs-driven calculator
-  visits stay distinguishable. Vercel Analytics shows `utm_source` as a
-  filter; the `ref` value lands in the lead/waitlist sheets on signup.
+- Traffic tagging: the coming-soon page's corner link points to the
+  calculator with `?ref=labs&utm_source=labs`. Give the ad its own tag,
+  e.g. `?ref=ig-ad-1&utm_source=ig-ad`, so ad-driven and labs-driven
+  calculator visits stay distinguishable. Vercel Analytics shows
+  `utm_source` as a filter; the `ref` value lands in the lead/waitlist
+  sheets on signup.

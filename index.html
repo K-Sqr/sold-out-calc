@@ -4,30 +4,616 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="theme-color" content="#FBF9F5" />
+
+    <title>Sold-Out Labs — Coming Soon</title>
     <meta
       name="description"
-      content="How far are you from a sold-out drop? A free tool for fashion creators, designers, and small fashion brands to forecast warm demand before launch day."
+      content="Sold-Out Labs builds tools for people who run drops. Something new is in the works — leave your email if you want it first."
     />
-    <meta property="og:title" content="Sold-Out Gap Calculator" />
+    <link rel="canonical" href="https://sold-out-labs.vercel.app/" />
+
+    <meta property="og:site_name" content="Sold-Out Labs" />
+    <meta property="og:title" content="Sold-Out Labs — Coming Soon" />
     <meta
       property="og:description"
-      content="Find out how many warm buyers you're missing before launch day — in under 60 seconds."
+      content="We build tools for people who run drops. Something new is in the works."
     />
     <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://sold-out-labs.vercel.app/" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Sold-Out Labs — Coming Soon" />
+    <meta
+      name="twitter:description"
+      content="We build tools for people who run drops. Something new is in the works."
+    />
+
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,300..700,0..100;1,9..144,300..700,0..100&family=Inter:wght@400;500;600;700&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT@0,9..144,400..600,0..100;1,9..144,400..600,0..100&family=Inter:wght@400;500;600&display=swap"
       rel="stylesheet"
     />
 
-    <link rel="canonical" href="https://sold-out-calc.vercel.app/" />
-    <title>Sold-Out Gap Calculator — Sold-Out Labs</title>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "Sold-Out Labs",
+        "url": "https://sold-out-labs.vercel.app/",
+        "description": "Sold-Out Labs builds tools for people who run drops.",
+        "logo": "https://sold-out-labs.vercel.app/favicon.svg"
+      }
+    </script>
+
+    <style>
+      :root {
+        color-scheme: light;
+        --cream-50: #fbf9f5;
+        --cream-100: #f5f1ea;
+        --ink-100: #e8e5e0;
+        --ink-200: #c4bfb8;
+        --ink-400: #6b6864;
+        --ink-800: #1a1916;
+        --ink-900: #0e0d0b;
+        --accent: #c2562a;
+        --accent-ink: #7a3318;
+        --success: #3f6e4a;
+      }
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+      html {
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+      }
+      body {
+        background: var(--cream-50);
+        color: var(--ink-800);
+        font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
+        font-feature-settings: "ss01", "cv11";
+        min-height: 100svh;
+        display: flex;
+        flex-direction: column;
+      }
+      ::selection {
+        background: var(--ink-900);
+        color: var(--cream-50);
+      }
+      .container {
+        width: 100%;
+        max-width: 40rem;
+        margin: 0 auto;
+        padding: 0 1.25rem;
+      }
+      .serif {
+        font-family: "Fraunces", ui-serif, Georgia, serif;
+        font-variation-settings: "SOFT" 40, "WONK" 0;
+      }
+
+      /* Header */
+      header {
+        padding-top: 1.5rem;
+      }
+      header .container {
+        max-width: 64rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 1rem;
+      }
+      .wordmark {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        color: var(--ink-900);
+        text-decoration: none;
+      }
+      .wordmark-badge {
+        height: 1.75rem;
+        width: 1.75rem;
+        border-radius: 0.5rem;
+        background: var(--ink-900);
+        color: var(--cream-50);
+        display: grid;
+        place-items: center;
+        font-family: "Fraunces", Georgia, serif;
+        font-style: italic;
+        font-size: 15px;
+      }
+      .wordmark-name {
+        font-size: 13px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        font-weight: 500;
+      }
+      /* Subtle corner link to the calculator. */
+      .corner-link {
+        font-size: 12.5px;
+        letter-spacing: -0.01em;
+        color: var(--ink-400);
+        text-decoration: none;
+        white-space: nowrap;
+        transition: color 0.2s;
+      }
+      .corner-link:hover {
+        color: var(--ink-900);
+      }
+
+      /* Hero */
+      main {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 3rem 0;
+        text-align: center;
+      }
+      .eyebrow {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.75rem;
+        font-size: 11px;
+        letter-spacing: 0.24em;
+        text-transform: uppercase;
+        color: var(--ink-400);
+        font-weight: 500;
+      }
+      .eyebrow::before,
+      .eyebrow::after {
+        content: "";
+        height: 1px;
+        width: 1.5rem;
+        background: var(--ink-200);
+      }
+      .eyebrow .dot {
+        display: inline-block;
+        height: 4px;
+        width: 4px;
+        border-radius: 50%;
+        background: var(--accent);
+        margin-right: 0.5rem;
+      }
+      h1 {
+        margin-top: 1.5rem;
+        font-size: clamp(46px, 11vw, 76px);
+        line-height: 1.02;
+        letter-spacing: -0.035em;
+        font-weight: 500;
+        color: var(--ink-900);
+      }
+      h1 em {
+        font-style: italic;
+        color: var(--accent-ink);
+        font-variation-settings: "SOFT" 60, "opsz" 144;
+      }
+      .sub {
+        margin: 1.25rem auto 0;
+        max-width: 28rem;
+        font-size: 16px;
+        line-height: 1.65;
+        color: var(--ink-400);
+      }
+
+      /* Blurred product teaser */
+      .teaser {
+        position: relative;
+        margin: 2.75rem auto 0;
+        max-width: 30rem;
+      }
+      .teaser-card {
+        background: #fff;
+        border: 1px solid var(--ink-100);
+        border-radius: 1.5rem;
+        padding: 1.75rem;
+        box-shadow: 0 1px 2px rgba(14, 13, 11, 0.04),
+          0 8px 24px -12px rgba(14, 13, 11, 0.1);
+        overflow: hidden;
+      }
+      .teaser-inner {
+        filter: blur(7px);
+        opacity: 0.75;
+        pointer-events: none;
+        user-select: none;
+        text-align: left;
+      }
+      .t-row {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .t-chip {
+        height: 8px;
+        border-radius: 99px;
+        background: var(--ink-100);
+      }
+      .t-chip.dark {
+        background: var(--ink-200);
+      }
+      .t-number {
+        font-family: "Fraunces", Georgia, serif;
+        font-size: 56px;
+        line-height: 1;
+        letter-spacing: -0.02em;
+        color: var(--ink-900);
+        margin-top: 1.25rem;
+      }
+      .t-bar {
+        margin-top: 1.25rem;
+        height: 8px;
+        border-radius: 99px;
+        background: var(--cream-100);
+        overflow: hidden;
+      }
+      .t-bar span {
+        display: block;
+        height: 100%;
+        width: 62%;
+        border-radius: 99px;
+        background: var(--accent);
+      }
+      .t-stats {
+        margin-top: 1.25rem;
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 0.625rem;
+      }
+      .t-stat {
+        border: 1px solid var(--ink-100);
+        border-radius: 0.875rem;
+        padding: 0.75rem;
+      }
+      /* Soft fade at the bottom of the blurred card. */
+      .teaser-card::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: 1.5rem;
+        background: linear-gradient(
+          to bottom,
+          transparent 40%,
+          rgba(251, 249, 245, 0.9)
+        );
+        pointer-events: none;
+      }
+      .teaser-pill {
+        position: absolute;
+        left: 50%;
+        bottom: -0.875rem;
+        transform: translateX(-50%);
+        background: var(--ink-900);
+        color: var(--cream-50);
+        font-size: 11px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        font-weight: 500;
+        padding: 0.5rem 1rem;
+        border-radius: 999px;
+        white-space: nowrap;
+      }
+
+      /* Waitlist */
+      .waitlist {
+        margin: 3rem auto 0;
+        max-width: 26rem;
+      }
+      .waitlist form {
+        display: flex;
+        flex-direction: column;
+        gap: 0.625rem;
+      }
+      .waitlist input[type="email"] {
+        width: 100%;
+        background: #fff;
+        border: 1px solid var(--ink-100);
+        border-radius: 999px;
+        padding: 0.875rem 1.25rem;
+        font-size: 15px;
+        font-family: inherit;
+        color: var(--ink-900);
+        outline: none;
+        transition: border-color 0.2s, box-shadow 0.2s;
+      }
+      .waitlist input[type="email"]::placeholder {
+        color: var(--ink-200);
+      }
+      .waitlist input[type="email"]:focus {
+        border-color: var(--ink-800);
+        box-shadow: 0 0 0 4px rgba(14, 13, 11, 0.06);
+      }
+      .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        background: var(--ink-900);
+        color: var(--cream-50);
+        padding: 0.875rem 1.5rem;
+        border-radius: 999px;
+        font-weight: 500;
+        font-size: 15px;
+        letter-spacing: -0.02em;
+        font-family: inherit;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+        transition: background 0.2s, transform 0.1s;
+      }
+      .btn-primary:hover {
+        background: var(--ink-800);
+      }
+      .btn-primary:active {
+        transform: scale(0.98);
+      }
+      .btn-primary:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+      @media (min-width: 480px) {
+        .waitlist form {
+          flex-direction: row;
+        }
+        .waitlist input[type="email"] {
+          flex: 1;
+        }
+        .waitlist .btn-primary {
+          flex-shrink: 0;
+        }
+      }
+      .waitlist .fine {
+        margin-top: 0.875rem;
+        font-size: 12px;
+        color: var(--ink-400);
+      }
+      .confirmation {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        font-size: 15px;
+        line-height: 1.5;
+        color: var(--success);
+      }
+      .confirmation svg {
+        flex-shrink: 0;
+      }
+      .waitlist.done form,
+      .waitlist.done .fine {
+        display: none;
+      }
+      .waitlist.done .confirmation {
+        display: flex;
+      }
+      .form-error {
+        display: none;
+        margin-top: 0.625rem;
+        font-size: 12.5px;
+        color: #a23a2a;
+      }
+      /* Honeypot — hidden from humans, visible to naive bots. */
+      .hp-field {
+        position: absolute;
+        left: -9999px;
+        opacity: 0;
+        height: 0;
+        width: 0;
+        overflow: hidden;
+      }
+
+      /* Footer */
+      footer {
+        padding: 2.5rem 0;
+        text-align: center;
+      }
+      .divider {
+        height: 1px;
+        width: 100%;
+        background: linear-gradient(
+          to right,
+          transparent,
+          var(--ink-100),
+          transparent
+        );
+        margin-bottom: 1.5rem;
+      }
+      footer p {
+        font-size: 11.5px;
+        color: var(--ink-200);
+      }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+    <header>
+      <div class="container">
+        <a href="/" class="wordmark" aria-label="Sold-Out Labs">
+          <span class="wordmark-badge">S</span>
+          <span class="wordmark-name">Sold-Out Labs</span>
+        </a>
+        <a href="/calc?ref=labs&utm_source=labs" class="corner-link">
+          Sold-Out Gap Calculator →
+        </a>
+      </div>
+    </header>
+
+    <main>
+      <div class="container">
+        <p class="eyebrow"><span class="dot"></span>Sold-Out Labs</p>
+
+        <h1 class="serif">Coming <em>soon.</em></h1>
+
+        <p class="sub">
+          We build tools for people who run drops. The next one is in the
+          works — leave your email if you want it first.
+        </p>
+
+        <!-- Blurred teaser: shapes only, promises nothing. -->
+        <div class="teaser" aria-hidden="true">
+          <div class="teaser-card">
+            <div class="teaser-inner">
+              <div class="t-row">
+                <span class="t-chip dark" style="width: 34%"></span>
+                <span class="t-chip" style="width: 18%"></span>
+              </div>
+              <div class="t-number serif">1,347</div>
+              <div class="t-row" style="margin-top: 0.5rem">
+                <span class="t-chip" style="width: 26%"></span>
+              </div>
+              <div class="t-bar"><span></span></div>
+              <div class="t-stats">
+                <div class="t-stat">
+                  <span class="t-chip" style="width: 70%; display: block"></span>
+                  <span
+                    class="t-chip dark"
+                    style="width: 45%; display: block; margin-top: 0.625rem"
+                  ></span>
+                </div>
+                <div class="t-stat">
+                  <span class="t-chip" style="width: 60%; display: block"></span>
+                  <span
+                    class="t-chip dark"
+                    style="width: 50%; display: block; margin-top: 0.625rem"
+                  ></span>
+                </div>
+                <div class="t-stat">
+                  <span class="t-chip" style="width: 75%; display: block"></span>
+                  <span
+                    class="t-chip dark"
+                    style="width: 40%; display: block; margin-top: 0.625rem"
+                  ></span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <span class="teaser-pill">In the works</span>
+        </div>
+
+        <div class="waitlist" id="waitlist">
+          <!--
+            Email capture posts to a Google Apps Script bound to a Google Sheet
+            (same setup as the calculator's report capture). Works with JS
+            disabled: the browser posts the form natively and the script
+            returns a styled confirmation page.
+
+            Setup: docs/LABS_SETUP.md — replace the action URL below with your
+            deployed Apps Script web app URL.
+          -->
+          <form
+            id="waitlist-form"
+            method="POST"
+            action="https://script.google.com/macros/s/PASTE_YOUR_DEPLOYMENT_ID_HERE/exec"
+          >
+            <input type="hidden" name="source" value="labs-coming-soon" />
+            <input type="hidden" name="ref" id="ref-field" value="" />
+            <input type="hidden" name="page" id="page-field" value="/" />
+            <!-- Honeypot: real users never see or fill this. -->
+            <div class="hp-field" aria-hidden="true">
+              <label for="company">Company</label>
+              <input
+                type="text"
+                id="company"
+                name="company"
+                tabindex="-1"
+                autocomplete="off"
+              />
+            </div>
+
+            <label class="hp-field" for="waitlist-email">Email</label>
+            <input
+              id="waitlist-email"
+              type="email"
+              name="email"
+              required
+              placeholder="you@yourbrand.com"
+              autocomplete="email"
+              inputmode="email"
+            />
+            <button type="submit" class="btn-primary" id="waitlist-submit">
+              Notify me
+            </button>
+          </form>
+
+          <p class="form-error" id="form-error" role="alert">
+            Something went wrong. Please try again.
+          </p>
+
+          <p class="fine">No spam. We'll only email when there's something real.</p>
+
+          <p class="confirmation" role="status">
+            <svg width="15" height="15" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+              <path
+                d="M3 7.5l2.8 2.8L11 4.5"
+                stroke="currentColor"
+                stroke-width="1.6"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+            You're on the list. We'll only email when there's something real.
+          </p>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <div class="container">
+        <div class="divider"></div>
+        <p>© <span id="year">2026</span> Sold-Out Labs</p>
+      </div>
+    </footer>
+
+    <script>
+      // Progressive enhancement only — the form posts natively without JS.
+      (function () {
+        document.getElementById("year").textContent = new Date().getFullYear();
+
+        // Carry the ad/traffic tag through to the sheet.
+        var params = new URLSearchParams(window.location.search);
+        document.getElementById("ref-field").value = params.get("ref") || "";
+        document.getElementById("page-field").value = window.location.href;
+
+        var form = document.getElementById("waitlist-form");
+        var card = document.getElementById("waitlist");
+        var button = document.getElementById("waitlist-submit");
+        var errorEl = document.getElementById("form-error");
+
+        // If the endpoint isn't configured yet, leave the native flow alone
+        // (it will fail loudly instead of pretending to work).
+        if (form.action.indexOf("PASTE_YOUR_DEPLOYMENT_ID") !== -1) return;
+
+        form.addEventListener("submit", function (e) {
+          e.preventDefault();
+          errorEl.style.display = "none";
+          button.disabled = true;
+          button.textContent = "Adding you…";
+
+          var body = new URLSearchParams(new FormData(form));
+          body.set("format", "json");
+
+          fetch(form.action, { method: "POST", body: body })
+            .then(function (res) {
+              if (!res.ok) throw new Error("HTTP " + res.status);
+              return res.json().catch(function () {
+                return { ok: true };
+              });
+            })
+            .then(function (data) {
+              if (data && data.ok === false) throw new Error(data.error);
+              card.classList.add("done");
+            })
+            .catch(function () {
+              button.disabled = false;
+              button.textContent = "Notify me";
+              errorEl.style.display = "block";
+            });
+        });
+      })();
+    </script>
+
+    <!-- Vercel Web Analytics (static page variant). -->
+    <script defer src="/_vercel/insights/script.js"></script>
   </body>
 </html>

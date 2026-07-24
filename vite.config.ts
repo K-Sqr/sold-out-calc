@@ -2,12 +2,12 @@ import { defineConfig, type Plugin } from "vite";
 import react from "@vitejs/plugin-react";
 
 /**
- * Serve clean routes (e.g. /diagnostic, /snapshot) as their .html entry in
+ * Serve clean routes (e.g. /calc, /diagnostic) as their .html entry in
  * dev + preview, mirroring the production rewrites in vercel.json so links
  * work the same everywhere.
  */
 function cleanRouteRewrite(): Plugin {
-  const routes = ["diagnostic", "snapshot", "labs"];
+  const routes = ["calc", "diagnostic", "snapshot"];
   const rewrite = (req: { url?: string | undefined }) => {
     const url = req.url ?? "";
     for (const route of routes) {
@@ -44,14 +44,14 @@ export default defineConfig({
   build: {
     rollupOptions: {
       input: {
-        // The free Sold-Out Gap Calculator (unchanged).
+        // Sold-Out Labs coming-soon page — the site root (static, no React).
         main: "index.html",
+        // The free Sold-Out Gap Calculator.
+        calc: "calc.html",
         // The Sold-Out Stage Diagnostic V0.
         diagnostic: "diagnostic.html",
         // The Sold-Out Snapshot Generator V0 (internal builder + founder view).
         snapshot: "snapshot.html",
-        // Sold-Out Labs coming-soon / waitlist page (static, no React).
-        labs: "labs.html",
       },
     },
   },

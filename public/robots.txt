@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /snapshot
 
-Sitemap: https://sold-out-calc.vercel.app/sitemap.xml
+Sitemap: https://sold-out-labs.vercel.app/sitemap.xml

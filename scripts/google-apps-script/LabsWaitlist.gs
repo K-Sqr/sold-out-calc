@@ -7,7 +7,7 @@
  *
  * Full setup steps: docs/LABS_WAITLIST_SETUP.md
  *
- * The page (/labs) submits in two ways:
+ * The coming-soon page (site root) submits in two ways:
  *   1. No JS: a native HTML form POST (form-urlencoded). We respond with a
  *      small styled HTML confirmation page.
  *   2. With JS: fetch() sends the same fields plus format=json. We respond
@@ -20,7 +20,7 @@ const SHEET_NAME = 'Waitlist';
 const BRAND_NAME = 'Sold-Out Labs';
 
 // Where the "Back" link on the no-JS confirmation page points.
-const LABS_URL = 'https://sold-out-calc.vercel.app/labs';
+const LABS_URL = 'https://sold-out-labs.vercel.app/';
 
 // ---------- Entry points ---------------------------------------------------
 
