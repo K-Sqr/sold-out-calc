@@ -7,7 +7,8 @@ JavaScript blocked.
 Three things need doing before the ad goes out:
 
 1. [Wire up the waitlist email capture](#1-waitlist-email-capture) (~10 min)
-2. [Buy and connect the domain](#2-domain) (~15 min)
+2. [Decide the domain](#2-domain) — either use the vercel.app URLs as-is
+   (nothing to do) or buy `soldoutlabs.com` (~15 min)
 3. [Get it on Google](#3-seo--google-search-console) (~10 min)
 
 ---
@@ -73,15 +74,44 @@ version).
 
 ## 2. Domain
 
-**Recommendation: buy `soldoutlabs.com`.**
+Two ways to run this. Both work — Option A costs nothing and works today,
+Option B is stronger long-term.
 
-`so.labs` is **not an option** — `.labs` is not a real TLD in the global DNS
-root zone (it only exists as a Web3/blockchain name that normal browsers and
-Google cannot resolve). A subdomain of the vercel.app URL works technically
-but looks less legitimate in an ad context and is weaker for ranking on a
-brand-name search.
+One thing that's off the table either way: `so.labs`. `.labs` is not a real
+TLD in the global DNS root zone (it only exists as a Web3/blockchain name
+that normal browsers and Google cannot resolve).
 
-### Connect it to Vercel
+### Option A — no domain, use the vercel.app URLs as-is
+
+Use these links directly:
+
+| Page | URL |
+| --- | --- |
+| Calculator | `https://sold-out-calc.vercel.app/` |
+| Labs coming-soon page | `https://sold-out-calc.vercel.app/labs` |
+
+**There is nothing to configure.** Every URL in the codebase (canonical
+tags, `og:url`, JSON-LD, `robots.txt`, `sitemap.xml`, the Apps Script
+`LABS_URL`) already points at `sold-out-calc.vercel.app`, and production
+`.vercel.app` domains are fully indexable by Google (only Vercel *preview*
+deployments get a noindex header). The calculator's homepage title already
+contains "Sold-Out Labs", so the brand name is searchable on both pages.
+
+For the ad / IG bio, link to `https://sold-out-calc.vercel.app/labs` (or
+the calculator root — the footer links between them either way).
+
+Then do the Search Console steps in
+[section 3, "Using the vercel.app URL"](#if-youre-using-the-vercelapp-url-option-a) —
+that part is required no matter which option you pick.
+
+Trade-offs to know about: a shared `.vercel.app` subdomain carries slightly
+less trust with Google and looks less polished to a person reading the URL,
+and if you buy a domain later the SEO history mostly restarts (redirects
+carry some of it over). Since "Sold-Out Labs" is a distinctive phrase with
+near-zero competition, ranking for the brand-name search from the vercel.app
+URL is still very plausible.
+
+### Option B — buy `soldoutlabs.com` (recommended long-term)
 
 1. Buy `soldoutlabs.com` (Namecheap, Cloudflare, or straight from Vercel —
    buying through Vercel skips the DNS steps).
@@ -115,27 +145,44 @@ containing "Sold-Out Labs", canonical URL, Open Graph tags, JSON-LD
 `Organization` markup, `robots.txt`, `sitemap.xml`, and an internal link from
 the calculator's footer. What's left is telling Google the page exists:
 
+### If you're using the vercel.app URL (Option A)
+
 1. Go to [Google Search Console](https://search.google.com/search-console)
-   and add a property:
-   - If the domain is on Vercel: use a **Domain** property and verify with
-     the TXT record (Vercel dashboard → Domains → your domain → shows you
-     how, or add the TXT in your registrar).
-   - For the vercel.app URL in the meantime: use a **URL prefix** property
-     for `https://sold-out-calc.vercel.app/` and verify with the HTML tag
-     method (paste the `<meta name="google-site-verification" ...>` tag into
-     the `<head>` of `index.html` and `labs.html`, redeploy).
-2. In Search Console: **Sitemaps → Add** → `sitemap.xml` → Submit.
-3. **URL Inspection** → paste the labs URL → **Request Indexing**. This is
-   the lever that matters for the weekend deadline — it usually gets a page
-   indexed within hours-to-a-couple-of-days instead of weeks.
-4. Repeat "Request Indexing" for the calculator root URL since its title
-   changed to "Sold-Out Labs".
+   → **Add property** → choose **URL prefix** (not Domain — you don't own
+   `vercel.app`) → enter `https://sold-out-calc.vercel.app/`.
+2. Verify ownership. Search Console's default is the **HTML file** method:
+   it gives you a file like `google5fff8f9c303df6e0.html` to serve from the
+   site root. Drop it into `public/` (Vite copies everything there to the
+   deployed root) and deploy — it's then live at
+   `https://sold-out-calc.vercel.app/google5fff8f9c303df6e0.html`. Click
+   **Verify**. Don't delete the file afterwards; Google re-checks it.
+
+   > Ours is already committed at `public/google5fff8f9c303df6e0.html`.
+
+   The **HTML tag** method (a `<meta name="google-site-verification">` tag
+   pasted into the `<head>` of both `index.html` and `labs.html`) works too.
+   The DNS method won't work here since the `vercel.app` domain isn't yours.
+3. **Sitemaps → Add a new sitemap** → enter `sitemap.xml` → Submit.
+4. **URL Inspection** → paste `https://sold-out-calc.vercel.app/labs` →
+   **Request Indexing**. This is the lever that matters for the weekend
+   deadline — it usually gets a page indexed within
+   hours-to-a-couple-of-days instead of weeks.
+5. Repeat Request Indexing for `https://sold-out-calc.vercel.app/` since
+   its title changed to "Sold-Out Labs".
+
+### If you're on soldoutlabs.com (Option B)
+
+1. In Search Console, add a **Domain** property for `soldoutlabs.com` and
+   verify with the TXT record (Vercel dashboard → Domains → your domain →
+   shows you how, or add the TXT in your registrar).
+2. Update the hardcoded URLs as described in Option B of the domain section,
+   deploy, then submit `sitemap.xml` and Request Indexing on the new URLs
+   the same way as steps 3–5 above.
 
 Reality check on timing: a brand-new page ranking #1 for "Sold-Out Labs" the
 same weekend is not guaranteed. It helps a lot that the name is distinctive
 (near-zero competition for the exact phrase). Requesting indexing on day one
-+ the exact-match domain is the best available play. Backup: whoever asks
-gets the link in the IG bio.
+is the best available play. Backup: whoever asks gets the link in the IG bio.
 
 ### Analytics
 
