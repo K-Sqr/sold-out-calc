@@ -198,14 +198,14 @@ is the best available play. Backup: whoever asks gets the link in the IG bio.
 
 ### Analytics
 
-- The calculator already uses Vercel Analytics (`@vercel/analytics`).
-- The coming-soon page (`index.html`) includes the static-page equivalent
-  (`/_vercel/insights/script.js`). It reports automatically as long as
-  **Analytics is enabled** for the project in the Vercel dashboard
-  (Project → Analytics → Enable, if it isn't already).
+- **Umami Cloud** is the primary free tracker for visits + UTM/campaigns
+  (script on `/`, `/SoldOutGap`, `/diagnostic`, `/snapshot`). Details:
+  `docs/AD_TRACKING_SETUP.md` §3A.
+- Vercel Analytics (`@vercel/analytics` + `/_vercel/insights` on the Labs
+  page) remains as a light backup for raw page volume — not for UTM filters
+  on the free plan.
 - Traffic tagging: the coming-soon page's corner link points to the
   calculator with `?ref=labs&utm_source=labs`. Give the ad its own tag,
-  e.g. `?ref=ig-ad-1&utm_source=ig-ad`, so ad-driven and labs-driven
-  calculator visits stay distinguishable. Vercel Analytics shows
-  `utm_source` as a filter; the `ref` value lands in the lead/waitlist
-  sheets on signup.
+  e.g. `?ref=ig-ad-1&utm_source=instagram`, so ad-driven and labs-driven
+  calculator visits stay distinguishable. Umami shows UTM filters; the
+  `ref` value lands in the lead/waitlist sheets on signup.

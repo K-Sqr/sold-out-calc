@@ -91,6 +91,9 @@ The only time you'd edit `DiagnosticCode.gs` is to change the **scoring** logic
 
 ## Editing the scoring / routing
 
+Full under-the-hood write-up (stage rules, fit point table, thresholds, how to
+override with judgement): **`docs/SCORING_UNDER_THE_HOOD.md`**.
+
 Open `scripts/google-apps-script/DiagnosticCode.gs` and edit:
 
 - `estimateStage_` — Beta / Growth / Adaptation thresholds
