@@ -15,6 +15,8 @@ export type QuestionType =
   | "currency"
   | "percent"
   | "select"
+  /** Like `select`, but several options can be picked. Stored as "a|b|c". */
+  | "multiselect"
   | "yesno"
   | "date"
   | "textarea";
@@ -32,8 +34,14 @@ export interface Question {
   type: QuestionType;
   required?: boolean;
   placeholder?: string;
+  /** Short line shown under the field. */
   helper?: string;
-  /** For `select` / `yesno` (yesno auto-fills Yes/No if omitted). */
+  /**
+   * Longer plain-English explanation of the term / concept, shown behind an
+   * (i) icon next to the label. Use this for jargon (AOV, sell-through…).
+   */
+  info?: string;
+  /** For `select` / `multiselect` / `yesno` (yesno auto-fills Yes/No if omitted). */
   options?: QuestionOption[];
   /** Only show this question when another answer matches. */
   showIf?: { id: string; equals: string };

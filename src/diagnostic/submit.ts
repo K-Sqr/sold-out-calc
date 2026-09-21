@@ -12,8 +12,8 @@
  */
 
 import { DIAGNOSTIC_SECTIONS } from "./schema";
-import type { Answers } from "./types";
-import { isVisible } from "./logic";
+import type { Answers, Question } from "./types";
+import { isVisible, splitMulti } from "./logic";
 
 export interface DiagnosticField {
   id: string;
@@ -42,12 +42,11 @@ export function buildDiagnosticPayload(answers: Answers): DiagnosticPayload {
     for (const q of section.questions) {
       if (!isVisible(q, answers)) continue;
       const value = (answers[q.id] ?? "").toString().trim();
-      const option = q.options?.find((o) => o.value === value);
       fields.push({
         id: q.id,
         label: q.label,
         value,
-        display: option ? option.label : value,
+        display: displayFor(q, value),
       });
     }
   }
@@ -57,6 +56,17 @@ export function buildDiagnosticPayload(answers: Answers): DiagnosticPayload {
     sourceUrl: typeof window !== "undefined" ? window.location.href : "",
     fields,
   };
+}
+
+/**
+ * Human-readable value for the sheet. Selects map to their option label;
+ * multi-selects ("a|b") become a comma-separated list of labels, in pick order.
+ */
+function displayFor(q: Question, value: string): string {
+  if (!q.options || !value) return value;
+  const labelOf = (v: string) => q.options?.find((o) => o.value === v)?.label ?? v;
+  if (q.type === "multiselect") return splitMulti(value).map(labelOf).join(", ");
+  return labelOf(value);
 }
 
 export function isDemoMode(): boolean {

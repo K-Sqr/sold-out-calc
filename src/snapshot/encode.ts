@@ -1,3 +1,4 @@
+import { SNAPSHOT_MODES } from "./constants";
 import { emptySnapshot, type SnapshotData } from "./types";
 
 /**
@@ -8,6 +9,7 @@ import { emptySnapshot, type SnapshotData } from "./types";
 
 // Compact keys keep the shareable URL short.
 const FOUNDER_KEYS: Record<string, keyof SnapshotData> = {
+  m: "mode",
   b: "brandName",
   st: "stage",
   cr: "currentRevenue",
@@ -21,6 +23,7 @@ const FOUNDER_KEYS: Record<string, keyof SnapshotData> = {
   cl: "ctaLabel",
   cn: "ctaNote",
   cu: "ctaUrl",
+  rn: "roadmapNote",
 };
 
 function utf8ToBase64(str: string): string {
@@ -47,6 +50,8 @@ export function encodeSnapshot(data: SnapshotData): string {
   const compact: Record<string, string> = {};
   for (const [shortKey, field] of Object.entries(FOUNDER_KEYS)) {
     const value = (data[field] ?? "").toString().trim();
+    // Default mode is implied — leaving it out keeps existing links unchanged.
+    if (field === "mode" && value === "engine") continue;
     if (value) compact[shortKey] = value;
   }
   return toUrlSafe(utf8ToBase64(JSON.stringify(compact)));
@@ -63,6 +68,7 @@ export function decodeSnapshot(token: string): SnapshotData | null {
         (data[field] as string) = compact[shortKey];
       }
     }
+    if (!SNAPSHOT_MODES.includes(data.mode)) data.mode = "engine";
     return data;
   } catch {
     return null;

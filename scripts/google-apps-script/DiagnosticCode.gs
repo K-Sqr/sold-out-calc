@@ -15,6 +15,8 @@
  *   - Stage / fit / bottleneck / module scoring is intentionally simple and
  *     lives in ONE place (scoreSubmission_) so it's easy to update later.
  *   - NO hardcoded assumption that pre-launch demand is the bottleneck.
+ *   - The /snapshot builder can SAVE its review back onto a row
+ *     (POST {mode:'review'}), so the team's scoring is persistent.
  */
 
 // ---------- Config ---------------------------------------------------------
@@ -36,7 +38,17 @@ const INTERNAL_COLUMNS = [
   'Notes',
   'Next Step',
   'Follow-Up Status',
+  // Written by the /snapshot builder's "Save review to sheet":
+  'Strongest Lever',
+  'Scorecard',
+  'Snapshot Mode',
+  'Snapshot Link',
+  'Reviewed At',
 ];
+
+// Columns the builder is allowed to overwrite on a review save. Everything
+// else on the row (the founder's answers, Timestamp, Source URL) is read-only.
+const REVIEW_WRITABLE = INTERNAL_COLUMNS;
 
 // Max rows the /snapshot builder pulls when listing submissions.
 const LIST_LIMIT = 100;
@@ -123,6 +135,12 @@ function doPost(e) {
     }
 
     const data = JSON.parse(e.postData.contents);
+
+    // Team review save-back from /snapshot (access-key gated).
+    if (data && data.mode === 'review') {
+      return saveReview_(data);
+    }
+
     const fields = Array.isArray(data.fields) ? data.fields : [];
     if (!fields.length) {
       return jsonOut_({ ok: false, error: 'No fields submitted' });
@@ -144,6 +162,67 @@ function doPost(e) {
     Logger.log(err);
     return jsonOut_({ ok: false, error: String(err) });
   }
+}
+
+/**
+ * Persist the team's review onto an existing submission row.
+ *
+ * Body: { mode:'review', key, rowIndex, values:{ '<header>': '<value>', … } }
+ * Only INTERNAL_COLUMNS may be written; unknown headers are ignored. Sets
+ * 'Reviewed At' so the builder can mark the row as reviewed.
+ */
+function saveReview_(data) {
+  const provided = data.key || '';
+  const expected = PropertiesService.getScriptProperties().getProperty(LIST_KEY_PROP);
+  if (!expected) {
+    return jsonOut_({ ok: false, error: 'List access key not configured (run setListAccessKey).' });
+  }
+  if (String(provided) !== String(expected)) {
+    return jsonOut_({ ok: false, error: 'Invalid access key.' });
+  }
+
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sheet = ss.getSheetByName(SHEET_NAME);
+  if (!sheet) return jsonOut_({ ok: false, error: 'Diagnostics sheet not found.' });
+
+  const rowIndex = Number(data.rowIndex);
+  if (!isFinite(rowIndex) || rowIndex < 2 || rowIndex > sheet.getLastRow()) {
+    return jsonOut_({ ok: false, error: 'Row ' + data.rowIndex + ' does not exist.' });
+  }
+
+  const headers = ensureInternalColumns_(sheet);
+  const values = data.values && typeof data.values === 'object' ? data.values : {};
+  values['Reviewed At'] = new Date();
+
+  let written = 0;
+  Object.keys(values).forEach(function (header) {
+    if (REVIEW_WRITABLE.indexOf(header) === -1) return;
+    const col = headers.indexOf(header);
+    if (col === -1) return;
+    sheet.getRange(rowIndex, col + 1).setValue(values[header]);
+    written++;
+  });
+
+  return jsonOut_({ ok: true, rowIndex: rowIndex, written: written });
+}
+
+/**
+ * Make sure every INTERNAL_COLUMN exists (older sheets predate the builder's
+ * save-back columns). Missing ones are inserted just before 'Source URL' so
+ * the layout stays: Timestamp | ...questions... | internal | Source URL.
+ */
+function ensureInternalColumns_(sheet) {
+  let headers = readHeaders_(sheet);
+  INTERNAL_COLUMNS.forEach(function (label) {
+    if (headers.indexOf(label) !== -1) return;
+    let insertAt = headers.indexOf('Source URL');
+    if (insertAt === -1) insertAt = headers.length;
+    sheet.insertColumnBefore(insertAt + 1);
+    sheet.getRange(1, insertAt + 1).setValue(label);
+    headers = readHeaders_(sheet);
+  });
+  styleHeader_(sheet, headers.length);
+  return headers;
 }
 
 // ---------- Sheet (dynamic columns) ----------------------------------------
@@ -187,6 +266,7 @@ function readHeaders_(sheet) {
  * Timestamp | ...questions... | internal columns | Source URL.
  */
 function ensureColumns_(sheet, fields) {
+  ensureInternalColumns_(sheet);
   let headers = readHeaders_(sheet);
 
   fields.forEach(function (f) {
@@ -227,6 +307,7 @@ function appendSubmission_(sheet, data, fields, scores) {
   rowMap['Revenue Gap'] = scores.revenueGap;
   rowMap['Primary Growth Lever'] = scores.growthLever;
   rowMap['Primary Bottleneck'] = scores.bottleneck;
+  rowMap['Secondary Bottleneck'] = scores.secondaryBottleneck;
   rowMap['Recommended Sold-Out Engine'] = scores.engine;
   rowMap['Fit Status'] = scores.fitStatus;
 
@@ -257,13 +338,29 @@ function scoreSubmission_(byId) {
     revenueGap: revenueGap_(byId),
     growthLever: route.lever,
     bottleneck: route.bottleneck,
+    secondaryBottleneck: route.secondary,
     engine: route.engine,
     fitStatus: fitStatus_(byId, fitScore),
   };
 }
 
+/**
+ * Monthly revenue band used by stage / fit scoring. If the founder typed an
+ * exact average (monthly_revenue_avg) it wins over the coarse range pick.
+ */
+function monthlyBand_(b) {
+  const avg = num_(b.monthly_revenue_avg);
+  if (avg > 0) {
+    if (avg < 10000) return 'under_10k_mo';
+    if (avg < 30000) return '10k_30k_mo';
+    if (avg < 100000) return '30k_100k_mo';
+    return '100k_plus_mo';
+  }
+  return b.monthly_revenue || '';
+}
+
 function estimateStage_(b) {
-  const monthly = b.monthly_revenue || '';
+  const monthly = monthlyBand_(b);
   const launched = num_(b.num_drops) > 0;
 
   // Adaptation / Diversify: $100K+/month.
@@ -286,7 +383,7 @@ function paidFitScore_(b) {
 
   if (num_(b.num_drops) > 0) score += 15;
 
-  const monthly = b.monthly_revenue || '';
+  const monthly = monthlyBand_(b);
   if (monthly === '10k_30k_mo') score += 20;
   else if (monthly === '30k_100k_mo') score += 35;
   else if (monthly === '100k_plus_mo') score += 30; // very large may route to a future engine
@@ -336,9 +433,13 @@ function dropRangeMidpoint_(range) {
 }
 
 /**
- * Map the self-assessed constraint to a primary growth lever + the candidate
- * Sold-Out Engine we may install first. ENGINES ARE NOT BUILT YET — this is
- * just the routing label. All of this is intentionally easy to edit.
+ * Map the self-assessed constraint(s) to a primary growth lever + the
+ * candidate Sold-Out Engine we may install first. ENGINES ARE NOT BUILT YET —
+ * this is just the routing label. All of this is intentionally easy to edit.
+ *
+ * `bottleneck` is a multi-select ("aov_too_low|launch_chaotic"), in the order
+ * the founder picked. First pick = primary; second pick = secondary
+ * (written as "Lever — label" so the builder can read the lever back).
  */
 function routeBottleneck_(b) {
   // bottleneck value -> { label, lever, engine }
@@ -389,15 +490,27 @@ function routeBottleneck_(b) {
     },
   };
 
-  const v = b.bottleneck || '';
-  const hit = map[v];
+  const picks = String(b.bottleneck || '')
+    .split('|')
+    .map(function (p) { return p.trim(); })
+    .filter(function (p) { return p; });
+
+  const primary = picks[0] || '';
+  const secondaryKey = picks[1] || '';
+  const secondaryHit = map[secondaryKey];
+  const secondary = secondaryHit
+    ? secondaryHit.lever + ' — ' + secondaryHit.label
+    : secondaryKey;
+
+  const hit = map[primary];
   if (hit) {
-    return { bottleneck: hit.label, lever: hit.lever, engine: hit.engine };
+    return { bottleneck: hit.label, lever: hit.lever, engine: hit.engine, secondary: secondary };
   }
   return {
-    bottleneck: v || 'Unsure (needs review)',
+    bottleneck: primary || 'Unsure (needs review)',
     lever: 'Needs review',
     engine: 'Needs manual review',
+    secondary: secondary,
   };
 }
 
@@ -406,7 +519,7 @@ function routeBottleneck_(b) {
  * for review since they may be routed to a future (not-yet-built) engine.
  */
 function fitStatus_(b, score) {
-  if ((b.monthly_revenue || '') === '100k_plus_mo') return 'Review — possible future engine';
+  if (monthlyBand_(b) === '100k_plus_mo') return 'Review — possible future engine';
   if (score >= 60) return 'Likely fit';
   if (score >= 35) return 'Maybe — needs review';
   return 'Not yet';
@@ -444,8 +557,38 @@ function setListAccessKey() {
 
 /**
  * Run this once (Run > runDiagnosticSelfTest) to verify the sheet gets
- * created and a row lands with scoring filled in.
+ * created and a row lands with scoring filled in. Expected: Estimated Stage
+ * "Growth / Scale + Stabilize" (from the exact average), Primary Bottleneck
+ * "AOV too low", Secondary Bottleneck "Launch — Chaotic launch execution".
  */
+/**
+ * Run after runDiagnosticSelfTest to verify a review save lands on the last
+ * row (requires setListAccessKey to have been run).
+ */
+function runReviewSelfTest() {
+  const sheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName(SHEET_NAME);
+  const key = PropertiesService.getScriptProperties().getProperty(LIST_KEY_PROP);
+  const out = doPost({
+    postData: {
+      contents: JSON.stringify({
+        mode: 'review',
+        key: key,
+        rowIndex: sheet.getLastRow(),
+        values: {
+          'Estimated Stage': 'Growth / Scale + Stabilize',
+          'Fit Status': 'V0 Fit',
+          'Strongest Lever': 'Offer',
+          'Scorecard': 'Revenue Stage: Moderate; Offer Strength: Strong',
+          'Snapshot Mode': 'engine',
+          'Notes': 'self-test review',
+          'Brand name': 'SHOULD NOT BE WRITTEN',
+        },
+      }),
+    },
+  });
+  Logger.log(out.getContent());
+}
+
 function runDiagnosticSelfTest() {
   doPost({
     postData: {
@@ -459,14 +602,16 @@ function runDiagnosticSelfTest() {
           { id: 'email_list_size', label: 'Email list size', value: '3000', display: '3000' },
           { id: 'sms_list_size', label: 'SMS list size', value: '800', display: '800' },
           { id: 'community_size', label: 'Waitlist / VIP / community size', value: '400', display: '400' },
-          { id: 'monthly_revenue', label: 'Approx. monthly revenue range', value: '30k_100k_mo', display: '$30K – $100K / month' },
+          { id: 'monthly_revenue', label: 'Approx. monthly revenue range', value: '10k_30k_mo', display: '$10K – $30K / month' },
+          // Exact average overrides the range for scoring (→ Growth stage here).
+          { id: 'monthly_revenue_avg', label: 'Average monthly revenue (exact, if you know it)', value: '45000', display: '45000' },
           { id: 'last_drop_revenue', label: 'Last drop revenue range', value: '25k_50k', display: '$25K – $50K' },
           { id: 'num_drops', label: 'Number of drops launched so far', value: '6', display: '6' },
           { id: 'gross_margin', label: 'Gross margin range', value: '60_75', display: '60% – 75%' },
           { id: 'drops_profitable', label: 'Are your drops profitable...', value: 'yes', display: 'Yes' },
           { id: 'runs_paid_ads', label: 'Do you run paid ads?', value: 'Yes', display: 'Yes' },
           { id: 'next_drop_goal', label: 'Next drop revenue goal', value: '60000', display: '60000' },
-          { id: 'bottleneck', label: 'What feels like the biggest constraint right now?', value: 'aov_too_low', display: 'AOV is too low' },
+          { id: 'bottleneck', label: 'What feels like the biggest constraint right now?', value: 'aov_too_low|launch_chaotic', display: 'AOV is too low, Launch day is chaotic' },
         ],
       }),
     },

@@ -1,4 +1,4 @@
-import type { ScoreLevel } from "./constants";
+import type { ScoreLevel, SnapshotMode } from "./constants";
 
 /**
  * The full snapshot record the team works with in the internal builder.
@@ -9,6 +9,8 @@ import type { ScoreLevel } from "./constants";
  */
 export interface SnapshotData {
   // --- Founder-facing ---
+  /** "engine" (bottleneck + recommended engine) or "roadmap" (stage + roadmap). */
+  mode: SnapshotMode;
   brandName: string;
   stage: string;
   currentRevenue: string;
@@ -23,6 +25,8 @@ export interface SnapshotData {
   ctaNote: string;
   /** Where the CTA button points (mailto:… or an https booking link). Optional. */
   ctaUrl: string;
+  /** Roadmap mode only — one personal line from the team, shown with the encouragement. */
+  roadmapNote: string;
 
   // --- Internal only ---
   paidFitScore: string;
@@ -34,6 +38,7 @@ export interface SnapshotData {
 
 export function emptySnapshot(): SnapshotData {
   return {
+    mode: "engine",
     brandName: "",
     stage: "",
     currentRevenue: "",
@@ -49,6 +54,7 @@ export function emptySnapshot(): SnapshotData {
     ctaNote: "A short call to confirm the diagnosis and map your install path.",
     ctaUrl:
       "mailto:toulzoned@gmail.com?subject=Sold-Out%20Review%20Call",
+    roadmapNote: "",
     paidFitScore: "",
     fitStatus: "",
     internalNotes: "",

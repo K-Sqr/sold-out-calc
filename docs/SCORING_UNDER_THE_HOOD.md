@@ -41,9 +41,13 @@ Generator exist so you can disagree with the algorithm and leave a trail.
 
 **Function:** `estimateStage_`
 
-Stage is driven almost entirely by **approx. monthly revenue**
-(`monthly_revenue`). Number of drops launched is checked but currently does
-not change the outcome (both branches land on Beta).
+Stage is driven almost entirely by the **monthly revenue band**. The band
+comes from `monthlyBand_`: if the founder typed an exact average
+(`monthly_revenue_avg`, the optional field under the range), that number is
+bucketed (`< $10K`, `< $30K`, `< $100K`, else `$100K+`) and **wins over** the
+range they picked; otherwise the range (`monthly_revenue`) is used as-is.
+Number of drops launched is checked but currently does not change the outcome
+(both branches land on Beta).
 
 | Monthly revenue answer | Estimated Stage |
 | --- | --- |
@@ -163,8 +167,12 @@ harsh. Track those overrides (see below).
 **Function:** `routeBottleneck_`
 
 This is **not** inferred from the score. The founder picks
-“What feels like the biggest constraint right now?” (`bottleneck`). That
-answer maps 1:1 to a primary growth lever + engine label.
+“What feels like the biggest constraint right now?” (`bottleneck`) — now a
+**multi-select**, stored as `first|second|…` in the order they clicked. The
+**first** pick maps 1:1 to the primary growth lever + engine label below; the
+**second** pick (if any) is written to **Secondary Bottleneck** as
+`Lever — label` (e.g. `Launch — Chaotic launch execution`). Further picks are
+kept in the answer column for the reviewer but not routed.
 
 | Founder picks (constraint) | Primary Growth Lever | Recommended Engine |
 | --- | --- | --- |
@@ -181,7 +189,8 @@ answer maps 1:1 to a primary growth lever + engine label.
 | Not sure | Needs review | Needs manual review |
 
 Engines are **routing labels** today (modules not built yet). Secondary
-bottleneck is left blank for the team.
+bottleneck is pre-filled from the founder's second pick and is fully
+overridable in the builder.
 
 ---
 
@@ -219,6 +228,7 @@ The product is built so **your call wins**. Use that on purpose.
 | **Diagnostics sheet** | Any internal column (stage, score, fit, engine, notes, next step, follow-up) | No |
 | **`/snapshot` builder → founder panel** | Stage, revenue, bottleneck, engine, next step, CTA | Yes (in the share link) |
 | **`/snapshot` builder → Internal scoring & routing** | Paid Fit Score, Fit status, follow-up, notes, 10-category scorecard | **No** — stays with the team |
+| **`/snapshot` builder → Save review to sheet** | Writes every builder field (both panels + the share link + snapshot type) back onto the submission's row and stamps `Reviewed At` | No |
 
 Workflow that keeps the algorithm honest:
 
@@ -240,26 +250,21 @@ This is **team judgement**, not auto-scored from the form. Use it when the
 numeric fit score looks fine but a specific lever is clearly broken (or the
 reverse).
 
-### Label mismatch to be aware of
+### Fit label translation
 
 The Apps Script writes fit labels like **Likely fit / Maybe — needs review /
-Not yet / Review — possible future engine**.
+Not yet / Review — possible future engine**; the builder dropdown uses the
+team's vocabulary. The builder translates on load (`normalizeFit` in
+`src/snapshot/load.ts`), so you always see a dropdown value:
 
-The Snapshot builder dropdown offers a slightly different set:
-**Too Early / V0 Fit / Advanced / Future Module / Not Fit / Needs Manual Review**.
-
-When you load a row, you may see the algorithm’s wording in the field even if
-it’s not in the dropdown list. Map them mentally as:
-
-| Algorithm (sheet) | Closest team dropdown |
+| Algorithm (sheet) | Builder dropdown |
 | --- | --- |
 | Likely fit | V0 Fit |
 | Maybe — needs review | Needs Manual Review |
-| Not yet | Too Early / Not Fit |
+| Not yet | Too Early |
 | Review — possible future engine | Advanced / Future Module |
 
-Aligning these labels (so sheet and builder use one vocabulary) is a small
-cleanup if the mismatch starts confusing reviews.
+Once you save the review, the sheet holds the team wording.
 
 ---
 
@@ -267,7 +272,7 @@ cleanup if the mismatch starts confusing reviews.
 
 When a row feels off:
 
-1. **Stage wrong?** → Only look at `monthly_revenue`. Everything else is ignored today.
+1. **Stage wrong?** → Only look at the monthly band (`monthly_revenue_avg` if typed, else `monthly_revenue`). Everything else is ignored today.
 2. **Score feels high/low?** → Recompute from the point table in §2. Owned list
    and monthly band dominate.
 3. **Fit status disagree?** → Check whether score sits just above/below 60 or 35,

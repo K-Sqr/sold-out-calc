@@ -1,20 +1,6 @@
 import { motion } from "framer-motion";
 
-/**
- * Only team members ever see the internal "Build snapshot" shortcut: it renders
- * exclusively when the shared access key has been saved in this browser (set in
- * the /snapshot builder). Founders never have that key, so they never see it.
- */
-function hasTeamAccess(): boolean {
-  try {
-    return !!localStorage.getItem("snapshot_list_key");
-  } catch {
-    return false;
-  }
-}
-
 export function Confirmation() {
-  const isTeam = hasTeamAccess();
   return (
     <motion.div
       initial={{ opacity: 0, y: 16 }}
@@ -61,25 +47,6 @@ export function Confirmation() {
         </span>
       </div>
 
-      {isTeam && (
-        <div className="mt-6 border-t border-ink-100 pt-5">
-          <a
-            href="/snapshot"
-            className="btn-secondary !py-2 text-[12.5px]"
-          >
-            Team · Build snapshot
-            <svg width="14" height="14" viewBox="0 0 16 16" fill="none" aria-hidden>
-              <path
-                d="M3 8h10m0 0L8.5 3.5M13 8l-4.5 4.5"
-                stroke="currentColor"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </a>
-        </div>
-      )}
     </motion.div>
   );
 }
