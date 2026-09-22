@@ -130,6 +130,7 @@ export const DIAGNOSTIC_SECTIONS: DiagnosticSection[] = [
       {
         id: "product_category",
         label: "Main product category",
+        required: true,
         type: "multiselect",
         half: true,
         helper: PICK_ALL,
@@ -182,6 +183,7 @@ export const DIAGNOSTIC_SECTIONS: DiagnosticSection[] = [
       {
         id: "email_list_size",
         label: "Email list size",
+        required: true,
         type: "number",
         placeholder: "0",
         half: true,
@@ -209,6 +211,7 @@ export const DIAGNOSTIC_SECTIONS: DiagnosticSection[] = [
       {
         id: "main_traffic_source",
         label: "Main traffic source right now",
+        required: true,
         type: "multiselect",
         helper: PICK_ALL,
         info:
@@ -252,6 +255,7 @@ export const DIAGNOSTIC_SECTIONS: DiagnosticSection[] = [
       {
         id: "last_drop_revenue",
         label: "Last drop revenue range",
+        required: true,
         type: "select",
         options: DROP_REVENUE_RANGES,
         half: true,
@@ -268,6 +272,7 @@ export const DIAGNOSTIC_SECTIONS: DiagnosticSection[] = [
       {
         id: "next_drop_goal",
         label: "Next drop revenue goal",
+        required: true,
         type: "currency",
         placeholder: "0",
         half: true,
@@ -277,6 +282,7 @@ export const DIAGNOSTIC_SECTIONS: DiagnosticSection[] = [
       {
         id: "drop_frequency",
         label: "Drop frequency",
+        required: true,
         type: "select",
         half: true,
         info:
@@ -293,6 +299,7 @@ export const DIAGNOSTIC_SECTIONS: DiagnosticSection[] = [
       {
         id: "num_drops",
         label: "Number of drops launched so far",
+        required: true,
         type: "number",
         placeholder: "0",
         info:
@@ -350,6 +357,7 @@ export const DIAGNOSTIC_SECTIONS: DiagnosticSection[] = [
       {
         id: "gross_margin",
         label: "Gross margin range",
+        required: true,
         type: "select",
         options: GROSS_MARGIN_RANGES,
         half: true,
@@ -382,6 +390,7 @@ export const DIAGNOSTIC_SECTIONS: DiagnosticSection[] = [
       {
         id: "runs_paid_ads",
         label: "Do you run paid ads?",
+        required: true,
         type: "yesno",
         half: true,
         info:
@@ -390,6 +399,7 @@ export const DIAGNOSTIC_SECTIONS: DiagnosticSection[] = [
       {
         id: "knows_cac_roas",
         label: "Do you know your CAC / ROAS?",
+        required: true,
         type: "yesno",
         showIf: { id: "runs_paid_ads", equals: "Yes" },
         info:
@@ -399,6 +409,7 @@ export const DIAGNOSTIC_SECTIONS: DiagnosticSection[] = [
         id: "drops_profitable",
         label:
           "Are your drops profitable after product, shipping, fulfillment, and marketing?",
+        required: true,
         type: "select",
         options: YES_NO_NOTSURE,
         info:
@@ -417,6 +428,7 @@ export const DIAGNOSTIC_SECTIONS: DiagnosticSection[] = [
       {
         id: "hero_product",
         label: "What is the hero product / main piece in your next drop?",
+        required: true,
         type: "text",
         placeholder: "The piece everything centers on",
         info:
@@ -425,6 +437,7 @@ export const DIAGNOSTIC_SECTIONS: DiagnosticSection[] = [
       {
         id: "drop_structure",
         label: "Your next drop is built around…",
+        required: true,
         type: "select",
         info:
           "One hero product = a single piece (maybe in a few colours). Small capsule = roughly 3–8 pieces that go together. Large collection = a full range of 10+ pieces.",
@@ -447,6 +460,7 @@ export const DIAGNOSTIC_SECTIONS: DiagnosticSection[] = [
         id: "clear_reason_to_buy",
         label:
           "Is there a clear reason to buy this instead of similar alternatives?",
+        required: true,
         type: "select",
         info:
           "Imagine a shopper comparing your piece to two similar ones from other brands. Can they say in one sentence why yours is the one to get?",
@@ -460,6 +474,7 @@ export const DIAGNOSTIC_SECTIONS: DiagnosticSection[] = [
       {
         id: "checkout_above_50",
         label: "Is the expected checkout value above $50?",
+        required: true,
         type: "select",
         options: YES_NO_NOTSURE,
         half: true,
@@ -469,6 +484,7 @@ export const DIAGNOSTIC_SECTIONS: DiagnosticSection[] = [
       {
         id: "items_per_order",
         label: "Do customers usually buy one item or multiple?",
+        required: true,
         type: "select",
         half: true,
         info:
@@ -492,6 +508,7 @@ export const DIAGNOSTIC_SECTIONS: DiagnosticSection[] = [
       {
         id: "understand_what_5s",
         label: "Can a new person understand WHAT the product is in 5 seconds?",
+        required: true,
         type: "select",
         info:
           "Show your launch post or product page to someone who has never seen your brand. Within 5 seconds, can they say what the item is (a jacket, a ring, a set)?",
@@ -500,6 +517,7 @@ export const DIAGNOSTIC_SECTIONS: DiagnosticSection[] = [
       {
         id: "understand_why_5s",
         label: "Can they understand WHY it's special in 5 seconds?",
+        required: true,
         type: "select",
         info:
           "Same 5-second test: can they say what makes it different — the material, the fit, the story, the limited run?",
@@ -508,6 +526,7 @@ export const DIAGNOSTIC_SECTIONS: DiagnosticSection[] = [
       {
         id: "understand_who_5s",
         label: "Can they understand WHO it's for in 5 seconds?",
+        required: true,
         type: "select",
         info:
           "Can they tell who this is made for — the person, the style, the scene — without you explaining it?",
@@ -516,6 +535,7 @@ export const DIAGNOSTIC_SECTIONS: DiagnosticSection[] = [
       {
         id: "launch_posts_communicate",
         label: "Your launch posts mostly communicate…",
+        required: true,
         type: "multiselect",
         helper: PICK_ALL,
         info:
@@ -531,6 +551,7 @@ export const DIAGNOSTIC_SECTIONS: DiagnosticSection[] = [
       {
         id: "best_posts_best_converting",
         label: "Are your best-performing posts also your best-converting posts?",
+        required: true,
         type: "select",
         options: YES_NO_NOTSURE,
         info:
@@ -549,6 +570,7 @@ export const DIAGNOSTIC_SECTIONS: DiagnosticSection[] = [
       {
         id: "has_waitlist",
         label: "Do you have a pre-launch waitlist / \"get notified\" page?",
+        required: true,
         type: "yesno",
         half: true,
         info:
@@ -557,6 +579,7 @@ export const DIAGNOSTIC_SECTIONS: DiagnosticSection[] = [
       {
         id: "collects_email_predrop",
         label: "Do you collect email before drop day?",
+        required: true,
         type: "yesno",
         options: YES_SOMETIMES_NO,
         half: true,
@@ -583,6 +606,7 @@ export const DIAGNOSTIC_SECTIONS: DiagnosticSection[] = [
       {
         id: "knows_warm_buyers_needed",
         label: "Do you know how many warm buyers you need before launch day?",
+        required: true,
         type: "yesno",
         half: true,
         info:
@@ -591,6 +615,7 @@ export const DIAGNOSTIC_SECTIONS: DiagnosticSection[] = [
       {
         id: "relies_on_social",
         label: "Do you mostly rely on IG/TikTok posting to drive drop sales?",
+        required: true,
         type: "yesno",
         options: YES_SOMETIMES_NO,
         half: true,
@@ -600,6 +625,7 @@ export const DIAGNOSTIC_SECTIONS: DiagnosticSection[] = [
       {
         id: "has_launch_sequence",
         label: "Do you have a launch email / SMS sequence?",
+        required: true,
         type: "yesno",
         info:
           "A launch sequence is a pre-written set of emails / texts that go out around the drop — e.g. a teaser a week before, a reminder the day before, a \"we're live\" message, and a \"last chance\" message. If you write one email on launch morning, that's a No for now.",
@@ -623,6 +649,7 @@ export const DIAGNOSTIC_SECTIONS: DiagnosticSection[] = [
       {
         id: "announces_exact_time",
         label: "Do you announce an exact drop time?",
+        required: true,
         type: "yesno",
         options: YES_SOMETIMES_NO,
         half: true,
@@ -641,6 +668,7 @@ export const DIAGNOSTIC_SECTIONS: DiagnosticSection[] = [
       {
         id: "sends_reminders",
         label: "Do you send reminders at 48h / 24h / 3h / live?",
+        required: true,
         type: "yesno",
         options: YES_SOMETIMES_NO,
         half: true,
@@ -668,6 +696,7 @@ export const DIAGNOSTIC_SECTIONS: DiagnosticSection[] = [
       {
         id: "launch_feel",
         label: "Does launch day feel planned or chaotic?",
+        required: true,
         type: "select",
         info:
           "Planned = you know what goes out, when, and who does it. Chaotic = you're making posts, fixing the site, and answering DMs on the fly.",
@@ -690,6 +719,7 @@ export const DIAGNOSTIC_SECTIONS: DiagnosticSection[] = [
       {
         id: "captures_missed",
         label: "After a drop, do you capture people who missed it?",
+        required: true,
         type: "yesno",
         options: YES_SOMETIMES_NO,
         half: true,
@@ -717,6 +747,7 @@ export const DIAGNOSTIC_SECTIONS: DiagnosticSection[] = [
       {
         id: "customers_repeat",
         label: "Do customers repeat-buy across drops?",
+        required: true,
         type: "yesno",
         options: YES_SOMETIMES_NO,
         half: true,
@@ -734,6 +765,7 @@ export const DIAGNOSTIC_SECTIONS: DiagnosticSection[] = [
       {
         id: "post_drop_review",
         label: "Do you have a post-drop review process?",
+        required: true,
         type: "yesno",
         options: YES_SOMETIMES_NO,
         half: true,
@@ -752,6 +784,7 @@ export const DIAGNOSTIC_SECTIONS: DiagnosticSection[] = [
       {
         id: "repeatable_process",
         label: "Do you have a repeatable drop process?",
+        required: true,
         type: "yesno",
         half: true,
         info:
@@ -760,6 +793,7 @@ export const DIAGNOSTIC_SECTIONS: DiagnosticSection[] = [
       {
         id: "reviews_numbers",
         label: "Do you review numbers after each drop?",
+        required: true,
         type: "yesno",
         options: YES_SOMETIMES_NO,
         half: true,
@@ -778,6 +812,7 @@ export const DIAGNOSTIC_SECTIONS: DiagnosticSection[] = [
       {
         id: "team_structure",
         label: "Who's running things right now?",
+        required: true,
         type: "select",
         half: true,
         options: [

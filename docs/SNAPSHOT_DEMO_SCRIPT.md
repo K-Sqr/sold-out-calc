@@ -31,10 +31,10 @@ founder wants to see the intake itself — it's faster to say:
 > "A founder fills this out, it lands as a row in our Diagnostics sheet with
 > internal scoring already run automatically."
 
-If you *do* submit a live test one, point out the confirmation screen
-afterward has a **"Team · Build snapshot →"** shortcut — but only visible to
-you, because it only renders when your browser already holds the team key.
-That's the handoff from intake to snapshot.
+If you *do* submit a live test one, the confirmation screen is now purely
+founder-facing — the internal "Team · Build snapshot" shortcut that used to sit
+there was removed after founder feedback. The team goes straight to
+`/snapshot`; that's the handoff from intake to snapshot.
 
 ---
 
@@ -52,6 +52,10 @@ Load a real submission:
 
 Walk the fields top to bottom, narrating what each becomes on the founder's
 page:
+
+> **Note:** there are now two snapshot types — the engine recommendation below,
+> and a "Stage roadmap" for founders who aren't a fit yet. See
+> `docs/BACKLOG_DEMO_SCRIPT.md` §8 for demoing the roadmap.
 
 | Field in the builder | What it becomes for the founder |
 | --- | --- |

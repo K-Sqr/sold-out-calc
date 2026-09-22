@@ -45,10 +45,30 @@ export default function DiagnosticApp() {
   const scrollTop = () =>
     window.scrollTo({ top: 0, behavior: "smooth" });
 
+  /**
+   * Bring the first unanswered required question into view. Most sections are
+   * taller than a phone screen, so without this a failed "Next" can look like
+   * nothing happened.
+   */
+  const scrollToFirstError = (sectionErrors: Record<string, string>) => {
+    const firstId = section.questions.find((q) => sectionErrors[q.id])?.id;
+    if (!firstId) return;
+    window.requestAnimationFrame(() => {
+      const el = document.querySelector(`[data-question="${firstId}"]`);
+      if (!el) return;
+      el.scrollIntoView({ behavior: "smooth", block: "center" });
+      const focusable = el.querySelector<HTMLElement>(
+        "input, textarea, select, button[role='radio'], button[role='checkbox']"
+      );
+      focusable?.focus({ preventScroll: true });
+    });
+  };
+
   const goNext = async () => {
     const sectionErrors = validateSection(section, answers);
     if (Object.keys(sectionErrors).length > 0) {
       setErrors(sectionErrors);
+      scrollToFirstError(sectionErrors);
       return;
     }
 
@@ -140,6 +160,7 @@ export default function DiagnosticApp() {
                     {visibleQuestions.map((q) => (
                       <div
                         key={q.id}
+                        data-question={q.id}
                         className={q.half ? "sm:col-span-1" : "sm:col-span-2"}
                       >
                         <Field
@@ -295,7 +316,7 @@ function Intro({ onStart }: { onStart: () => void }) {
             <circle cx="7" cy="7" r="6" stroke="currentColor" strokeWidth="1.2" />
             <path d="M7 4v3.2L9 8.4" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
           </svg>
-          ~5 minutes · no signup
+          ~6 minutes · no signup
         </div>
       </div>
     </motion.section>
