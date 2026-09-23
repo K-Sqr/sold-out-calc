@@ -15,3 +15,6 @@ dist-ssr
 # tsc -b composite build emits .js/.d.ts next to vite.config.ts
 vite.config.js
 vite.config.d.ts
+
+# Stray Python virtualenvs (this is a Node project)
+.venv/
