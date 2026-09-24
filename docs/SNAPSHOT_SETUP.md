@@ -9,6 +9,7 @@ page:
 | `/snapshot` | Internal team | Review a submission, assign/edit routing, score categories, generate a link |
 | `/snapshot?s=…` | Founder | The clean, branded snapshot (the link the team sends) |
 | `/snapshot?s=…&edit=1` | Internal team | Re-open an existing link in the builder to tweak it |
+| `/snapshot?guide=1` | Team (shareable) | **How scoring works** — the full explanation of stage, fit score, fit status, revenue gap and engine routing, plus a live calculator |
 
 There is **no login, no database, and no new deploy target** — the shareable
 link itself carries the founder-facing data, and internal scoring lives in the

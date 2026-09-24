@@ -2,6 +2,7 @@ import { useMemo } from "react";
 import { decodeSnapshot } from "./encode";
 import { SnapshotView } from "./SnapshotView";
 import { SnapshotBuilder } from "./SnapshotBuilder";
+import { ScoringGuide } from "./ScoringGuide";
 
 /**
  * One page, two modes:
@@ -9,6 +10,7 @@ import { SnapshotBuilder } from "./SnapshotBuilder";
  *  - Founder view:  /snapshot?s=<token>          → clean "Your Sold-Out Snapshot"
  *  - Internal build: /snapshot                    → the team's review + builder
  *  - Re-edit a link: /snapshot?s=<token>&edit=1   → builder pre-filled from token
+ *  - Scoring guide:  /snapshot?guide=1            → how every number is worked out
  *
  * Everything is client-side and static — the link itself carries the data.
  */
@@ -18,6 +20,9 @@ export default function SnapshotApp() {
       return { mode: "build" as const, initial: null };
     }
     const params = new URLSearchParams(window.location.search);
+    if (params.get("guide") === "1") {
+      return { mode: "guide" as const, initial: null };
+    }
     const token = params.get("s");
     const editing = params.get("edit") === "1";
     const decoded = token ? decodeSnapshot(token) : null;
@@ -28,6 +33,9 @@ export default function SnapshotApp() {
     return { mode: "build" as const, initial: decoded };
   }, []);
 
+  if (mode === "guide") {
+    return <ScoringGuide />;
+  }
   if (mode === "view" && initial) {
     return <SnapshotView data={initial} />;
   }

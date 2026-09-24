@@ -4,6 +4,12 @@ How the Stage Diagnostic auto-fills **Estimated Stage**, **Paid Fit Score**,
 **Fit Status**, **Revenue Gap**, and **Recommended Sold-Out Engine** — and how
 the team overrides those calls with human judgement.
 
+> **Prefer a page you can click?** The same explanation, with tables generated
+> from the live constants and a calculator you can run numbers through, is at
+> **`/snapshot?guide=1`** ("How scoring works", linked from the Snapshot
+> builder header). Send that to anyone who asks how a number was reached —
+> this file is the written reference behind it.
+
 > **Source of truth:** all of this logic lives in one place —
 > `scripts/google-apps-script/DiagnosticCode.gs` (`scoreSubmission_` and the
 > helpers below it). The frontend form only collects answers; it does **not**
@@ -291,3 +297,5 @@ When a row feels off:
 - `docs/SNAPSHOT_DEMO_SCRIPT.md` — how to talk about “automation is a draft”
 - `src/diagnostic/schema.ts` — questions / answer values the scorer reads
 - `src/snapshot/constants.ts` — builder dropdown options (stage, engine, fit)
+- `src/snapshot/scoring.ts` — the browser-side mirror powering `/snapshot?guide=1`
+  (must be kept in step with `DiagnosticCode.gs`)

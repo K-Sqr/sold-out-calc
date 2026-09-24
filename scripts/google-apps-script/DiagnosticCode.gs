@@ -319,6 +319,11 @@ function appendSubmission_(sheet, data, fields, scores) {
 }
 
 // ---------- Scoring (edit me freely) ---------------------------------------
+//
+// ⚠️  KEEP IN SYNC: src/snapshot/scoring.ts mirrors every weight, threshold,
+// midpoint and routing label below so the Scoring Guide page
+// (/snapshot?guide=1) can show its working in the browser. If you change a
+// number here, change it there too, or the guide will explain the old rules.
 
 /**
  * Simple, EDITABLE first-pass scoring. The directive is explicit that this

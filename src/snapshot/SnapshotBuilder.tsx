@@ -452,7 +452,15 @@ export function SnapshotBuilder({ initial }: { initial: SnapshotData | null }) {
                 <p className="field-label">Category scorecard</p>
                 <p className="field-helper -mt-1 mb-3">
                   Quick read across each growth lever. No lever is assumed to be
-                  the bottleneck. Saved to the sheet with the review.
+                  the bottleneck. Saved to the sheet with the review.{" "}
+                  <a
+                    href="/snapshot?guide=1"
+                    target="_blank"
+                    rel="noopener"
+                    className="text-accent-ink underline underline-offset-2 hover:text-ink-900"
+                  >
+                    How the auto-scoring works
+                  </a>
                 </p>
                 <div className="space-y-2">
                   {SCORE_CATEGORIES.map((cat) => (
@@ -773,12 +781,20 @@ function BuilderHeader() {
           The Sold-Out System
         </span>
       </a>
-      <a
-        href="/diagnostic"
-        className="hidden sm:inline-flex text-[12.5px] tracking-tightish text-ink-400 hover:text-ink-900 transition-colors"
-      >
-        Stage Diagnostic →
-      </a>
+      <div className="hidden sm:flex items-center gap-5">
+        <a
+          href="/snapshot?guide=1"
+          className="text-[12.5px] tracking-tightish text-ink-400 hover:text-ink-900 transition-colors"
+        >
+          How scoring works
+        </a>
+        <a
+          href="/diagnostic"
+          className="text-[12.5px] tracking-tightish text-ink-400 hover:text-ink-900 transition-colors"
+        >
+          Stage Diagnostic →
+        </a>
+      </div>
     </header>
   );
 }
